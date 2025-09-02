@@ -35,6 +35,21 @@ run-demo:
 	@echo "Running full UDP demo..."
 	@go run cmd/examples/main.go demo
 
+# Run audio conversion test
+run-audio-test:
+	@echo "Running audio conversion test..."
+	@go run cmd/examples/audio_bridge.go test
+
+# Run audio bridge server
+run-audio-server:
+	@echo "Running audio bridge server..."
+	@go run cmd/examples/audio_bridge.go server
+
+# Run audio bridge client  
+run-audio-client:
+	@echo "Running audio bridge client..."
+	@go run cmd/examples/audio_bridge.go client
+
 # Format code
 fmt:
 	@echo "Formatting code..."
@@ -85,4 +100,7 @@ help:
 	@echo "  clean        - Clean build artifacts"
 	@echo "  deps         - Install dependencies"
 	@echo "  release      - Create release binaries"
-	@echo "  help         - Show this help"
+	@echo "  help         - Show this help
+  run-audio-test    - Run audio conversion test
+  run-audio-server  - Run audio bridge server  
+  run-audio-client  - Run audio bridge client"

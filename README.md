@@ -10,6 +10,7 @@ A Go library implementing the official USRP (Universal Software Radio Protocol) 
 ✅ **Official USRP Protocol**: 32-byte header, correct packet types, network byte order  
 ✅ **All Packet Types**: Voice, DTMF, Text, Ping, TLV, μ-law, ADPCM  
 ✅ **Amateur Radio Ready**: PTT control, callsign metadata, talk groups  
+✅ **Audio Conversion**: FFmpeg integration for Opus/Ogg streaming formats  
 ✅ **Production Tested**: Comprehensive test suite with all packet formats  
 ✅ **High Performance**: Efficient binary protocol handling  
 
@@ -69,6 +70,24 @@ tlv.SetCallsign("W1AW")
 data, _ := tlv.Marshal()
 ```
 
+### Audio Format Conversion
+
+Convert between USRP and compressed formats using FFmpeg:
+
+```go
+// Convert USRP to Opus for internet streaming
+converter, _ := audio.NewOpusConverter()
+defer converter.Close()
+
+opusData, _ := converter.USRPToFormat(voiceMessage)
+// Send opusData over internet...
+
+// Convert back from Opus to USRP
+usrpMessages, _ := converter.FormatToUSRP(opusData)
+```
+
+See [`docs/AUDIO_CONVERSION.md`](docs/AUDIO_CONVERSION.md) for complete examples.
+
 ## Protocol Specification
 
 ### Header Format (32 bytes, AllStarLink compatible)
@@ -115,6 +134,9 @@ go test ./pkg/usrp/ -v
 
 # Run benchmarks
 go test -bench=. ./pkg/usrp/
+
+# Test audio conversion (requires FFmpeg)
+go run cmd/examples/audio_bridge.go test
 ```
 
 ### Example Output
@@ -194,8 +216,14 @@ usrp-go/
 │   ├── protocol.go        # Message types & structures  
 │   ├── marshal.go         # Binary serialization
 │   └── protocol_test.go   # Comprehensive tests
+├── pkg/audio/             # Audio format conversion
+│   ├── converter.go       # FFmpeg integration
+│   └── converter_test.go  # Conversion tests
 ├── cmd/examples/          # Demo applications
-│   └── main.go           # Protocol compatibility tests
+│   ├── main.go           # Protocol compatibility tests
+│   └── audio_bridge.go   # Audio conversion examples
+├── docs/                  # Documentation
+│   └── AUDIO_CONVERSION.md # Audio conversion guide
 └── internal/transport/    # UDP transport layer (WIP)
     └── udp.go            # Network handling
 ```
