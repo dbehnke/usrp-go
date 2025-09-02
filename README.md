@@ -11,6 +11,7 @@ A Go library implementing the official USRP (Universal Software Radio Protocol) 
 ✅ **All Packet Types**: Voice, DTMF, Text, Ping, TLV, μ-law, ADPCM  
 ✅ **Amateur Radio Ready**: PTT control, callsign metadata, talk groups  
 ✅ **Audio Conversion**: FFmpeg integration for Opus/Ogg streaming formats  
+✅ **Discord Integration**: Real-time bridge between amateur radio and Discord voice  
 ✅ **Production Tested**: Comprehensive test suite with all packet formats  
 ✅ **High Performance**: Efficient binary protocol handling  
 
@@ -87,6 +88,24 @@ usrpMessages, _ := converter.FormatToUSRP(opusData)
 ```
 
 See [`docs/AUDIO_CONVERSION.md`](docs/AUDIO_CONVERSION.md) for complete examples.
+
+### Discord Integration
+
+Connect amateur radio to Discord voice channels:
+
+```bash
+# Set up Discord bot token and amateur radio callsign
+export DISCORD_TOKEN="your_bot_token"
+export AMATEUR_CALLSIGN="N0CALL"
+
+# Test Discord connection
+make run-discord-test
+
+# Run the bridge
+make run-discord-bridge
+```
+
+See [`docs/DISCORD_BRIDGE.md`](docs/DISCORD_BRIDGE.md) for complete setup guide.
 
 ## Protocol Specification
 
@@ -219,11 +238,19 @@ usrp-go/
 ├── pkg/audio/             # Audio format conversion
 │   ├── converter.go       # FFmpeg integration
 │   └── converter_test.go  # Conversion tests
-├── cmd/examples/          # Demo applications
-│   ├── main.go           # Protocol compatibility tests
-│   └── audio_bridge.go   # Audio conversion examples
+├── pkg/discord/           # Discord voice integration
+│   ├── bot.go            # Discord bot with voice capabilities
+│   ├── bridge.go         # USRP-Discord audio bridge
+│   └── bridge_test.go    # Discord integration tests
+├── cmd/examples/          # Protocol demo applications
+│   └── main.go           # Protocol compatibility tests
+├── cmd/audio-bridge/      # Audio conversion demos
+│   └── main.go           # Audio bridge examples
+├── cmd/discord-bridge/    # Discord integration demos
+│   └── main.go           # Discord bridge examples
 ├── docs/                  # Documentation
-│   └── AUDIO_CONVERSION.md # Audio conversion guide
+│   ├── AUDIO_CONVERSION.md # Audio conversion guide
+│   └── DISCORD_BRIDGE.md  # Discord integration guide
 └── internal/transport/    # UDP transport layer (WIP)
     └── udp.go            # Network handling
 ```
@@ -241,7 +268,8 @@ This implementation prioritizes **exact compatibility** with existing USRP deplo
 
 Perfect for:
 - **AllStarLink node linking**
-- **Digital voice bridging**
+- **Digital voice bridging** 
+- **Discord-amateur radio integration**
 - **Experimental amateur radio protocols**
 - **Emergency communication systems**
 

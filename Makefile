@@ -38,17 +38,30 @@ run-demo:
 # Run audio conversion test
 run-audio-test:
 	@echo "Running audio conversion test..."
-	@go run cmd/examples/audio_bridge.go test
+	@go run cmd/audio-bridge/main.go test
 
 # Run audio bridge server
 run-audio-server:
 	@echo "Running audio bridge server..."
-	@go run cmd/examples/audio_bridge.go server
+	@go run cmd/audio-bridge/main.go server
 
 # Run audio bridge client  
 run-audio-client:
 	@echo "Running audio bridge client..."
-	@go run cmd/examples/audio_bridge.go client
+	@go run cmd/audio-bridge/main.go client
+
+# Discord bridge targets
+run-discord-test:
+	@echo "Running Discord bot test..."
+	@go run cmd/discord-bridge/main.go test
+
+run-discord-bridge:
+	@echo "Running Discord-USRP bridge..."
+	@go run cmd/discord-bridge/main.go bridge
+
+run-discord-server:
+	@echo "Running USRP test server for Discord bridge..."
+	@go run cmd/discord-bridge/main.go server
 
 # Format code
 fmt:
@@ -100,7 +113,14 @@ help:
 	@echo "  clean        - Clean build artifacts"
 	@echo "  deps         - Install dependencies"
 	@echo "  release      - Create release binaries"
-	@echo "  help         - Show this help
-  run-audio-test    - Run audio conversion test
-  run-audio-server  - Run audio bridge server  
-  run-audio-client  - Run audio bridge client"
+	@echo "  help         - Show this help"
+	@echo ""
+	@echo "Audio Conversion:"
+	@echo "  run-audio-test    - Run audio conversion test"
+	@echo "  run-audio-server  - Run audio bridge server"
+	@echo "  run-audio-client  - Run audio bridge client"
+	@echo ""
+	@echo "Discord Integration:"
+	@echo "  run-discord-test    - Test Discord bot connection"
+	@echo "  run-discord-bridge  - Run Discord-USRP bridge"
+	@echo "  run-discord-server  - Run USRP test server for Discord"
