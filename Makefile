@@ -64,6 +64,19 @@ build-usrp-bridge:
 	@mkdir -p bin
 	@go build -o bin/usrp-bridge cmd/usrp-bridge/main.go
 
+# Discord bridge targets
+run-discord-test:
+	@echo "Running Discord bot test..."
+	@go run cmd/discord-bridge/main.go test
+
+run-discord-bridge:
+	@echo "Running Discord-USRP bridge..."
+	@go run cmd/discord-bridge/main.go bridge
+
+run-discord-server:
+	@echo "Running USRP test server for Discord bridge..."
+	@go run cmd/discord-bridge/main.go server
+
 # Format code
 fmt:
 	@echo "Formatting code..."
@@ -125,3 +138,8 @@ help:
 	@echo "  run-usrp-bridge        - Run USRP bridge utility"
 	@echo "  run-usrp-bridge-config - Generate sample configuration"
 	@echo "  build-usrp-bridge      - Build USRP bridge binary"
+	@echo ""
+	@echo "Discord Integration:"
+	@echo "  run-discord-test    - Test Discord bot connection"
+	@echo "  run-discord-bridge  - Run Discord-USRP bridge"
+	@echo "  run-discord-server  - Run USRP test server for Discord"

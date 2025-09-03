@@ -12,6 +12,7 @@ A Go library implementing the official USRP (Universal Software Radio Protocol) 
 ✅ **Amateur Radio Ready**: PTT control, callsign metadata, talk groups  
 ✅ **Audio Conversion**: FFmpeg integration for Opus/Ogg streaming formats  
 ✅ **USRP Bridge Utility**: AllStarLink to internet service bridge with multi-destination support  
+✅ **Discord Integration**: Real-time bridge between amateur radio and Discord voice  
 ✅ **Production Tested**: Comprehensive test suite with all packet formats  
 ✅ **High Performance**: Efficient binary protocol handling  
 
@@ -107,6 +108,24 @@ make run-usrp-bridge
 **Architecture**: `AllStarLink Node <--USRP--> Bridge <--Opus--> Internet Services`
 
 See [`docs/USRP_BRIDGE.md`](docs/USRP_BRIDGE.md) for complete setup guide.
+
+### Discord Integration
+
+Connect amateur radio to Discord voice channels:
+
+```bash
+# Set up Discord bot token and amateur radio callsign
+export DISCORD_TOKEN="your_bot_token"
+export AMATEUR_CALLSIGN="N0CALL"
+
+# Test Discord connection
+make run-discord-test
+
+# Run the bridge
+make run-discord-bridge
+```
+
+See [`docs/DISCORD_BRIDGE.md`](docs/DISCORD_BRIDGE.md) for complete setup guide.
 
 ## Protocol Specification
 
@@ -239,15 +258,22 @@ usrp-go/
 ├── pkg/audio/             # Audio format conversion
 │   ├── converter.go       # FFmpeg integration
 │   └── converter_test.go  # Conversion tests
+├── pkg/discord/           # Discord voice integration
+│   ├── bot.go            # Discord bot with voice capabilities
+│   ├── bridge.go         # USRP-Discord audio bridge
+│   └── bridge_test.go    # Discord integration tests
 ├── cmd/examples/          # Protocol demo applications
 │   └── main.go           # Protocol compatibility tests
 ├── cmd/audio-bridge/      # Audio conversion demos
 │   └── main.go           # Audio bridge examples
 ├── cmd/usrp-bridge/       # USRP bridge utility
 │   └── main.go           # AllStarLink to internet bridge
+├── cmd/discord-bridge/    # Discord integration demos
+│   └── main.go           # Discord bridge examples
 ├── docs/                  # Documentation
 │   ├── AUDIO_CONVERSION.md # Audio conversion guide
-│   └── USRP_BRIDGE.md     # USRP bridge utility guide
+│   ├── USRP_BRIDGE.md     # USRP bridge utility guide
+│   └── DISCORD_BRIDGE.md  # Discord integration guide
 └── internal/transport/    # UDP transport layer (WIP)
     └── udp.go            # Network handling
 ```
@@ -267,6 +293,7 @@ Perfect for:
 - **AllStarLink node linking**
 - **Digital voice bridging**
 - **Internet service integration** (WhoTalkie, Discord)
+- **Discord-amateur radio integration**
 - **Experimental amateur radio protocols**
 - **Emergency communication systems**
 
