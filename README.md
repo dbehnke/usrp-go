@@ -127,6 +127,43 @@ make run-discord-bridge
 
 See [`docs/DISCORD_BRIDGE.md`](docs/DISCORD_BRIDGE.md) for complete setup guide.
 
+### Audio Router Hub
+
+Hub-and-spoke audio routing for connecting multiple amateur radio services:
+
+```bash
+# Generate sample configuration
+make run-audio-router-config
+
+# Edit audio-router.json with your settings
+# Configure AllStarLink nodes, WhoTalkie, Discord, etc.
+
+# Run the router
+make run-audio-router-with-config
+```
+
+**Architecture**: Scalable N-to-N audio routing with service prioritization:
+```
+AllStarLink-1 ←┐
+AllStarLink-2 ←┤    ┌─→ WhoTalkie-1
+AllStarLink-N ←┤    │   WhoTalkie-2  
+               ├────┤   WhoTalkie-N
+Discord-1 ←────┤    │
+Discord-2 ←────┤    └─→ Generic-1
+Discord-N ←────┘        Generic-N
+```
+
+Features:
+- **Multi-service support**: USRP, WhoTalkie, Discord, Generic UDP/TCP
+- **N instances per service**: Run multiple AllStarLink nodes, Discord bots, etc.
+- **Smart routing**: Service-specific routing rules and conflict resolution  
+- **Priority management**: Higher priority transmissions can preempt lower priority ones
+- **Audio conversion**: Automatic format conversion between services (PCM ↔ Opus)
+- **Real-time monitoring**: HTTP status page and statistics
+- **Amateur radio integration**: PTT control, callsign metadata, talk groups
+
+See [`docs/AUDIO_ROUTER.md`](docs/AUDIO_ROUTER.md) for complete setup guide.
+
 ## Protocol Specification
 
 ### Header Format (32 bytes, AllStarLink compatible)
@@ -270,10 +307,13 @@ usrp-go/
 │   └── main.go           # AllStarLink to internet bridge
 ├── cmd/discord-bridge/    # Discord integration demos
 │   └── main.go           # Discord bridge examples
+├── cmd/audio-router/      # Audio Router Hub
+│   └── main.go           # Hub-and-spoke audio routing service
 ├── docs/                  # Documentation
 │   ├── AUDIO_CONVERSION.md # Audio conversion guide
 │   ├── USRP_BRIDGE.md     # USRP bridge utility guide
-│   └── DISCORD_BRIDGE.md  # Discord integration guide
+│   ├── DISCORD_BRIDGE.md  # Discord integration guide
+│   └── AUDIO_ROUTER.md    # Audio Router Hub setup guide
 └── internal/transport/    # UDP transport layer (WIP)
     └── udp.go            # Network handling
 ```

@@ -77,6 +77,24 @@ run-discord-server:
 	@echo "Running USRP test server for Discord bridge..."
 	@go run cmd/discord-bridge/main.go server
 
+# Audio Router Hub targets
+run-audio-router:
+	@echo "Running Audio Router Hub..."
+	@go run cmd/audio-router/main.go
+
+run-audio-router-config:
+	@echo "Generating Audio Router Hub configuration..."
+	@go run cmd/audio-router/main.go -generate-config
+
+run-audio-router-with-config:
+	@echo "Running Audio Router Hub with configuration..."
+	@go run cmd/audio-router/main.go -config audio-router.json -verbose
+
+build-audio-router:
+	@echo "Building Audio Router Hub binary..."
+	@mkdir -p bin
+	@go build -o bin/audio-router cmd/audio-router/main.go
+
 # Format code
 fmt:
 	@echo "Formatting code..."
@@ -143,3 +161,9 @@ help:
 	@echo "  run-discord-test    - Test Discord bot connection"
 	@echo "  run-discord-bridge  - Run Discord-USRP bridge"
 	@echo "  run-discord-server  - Run USRP test server for Discord"
+	@echo ""
+	@echo "Audio Router Hub:"
+	@echo "  run-audio-router        - Run Audio Router Hub with default config"
+	@echo "  run-audio-router-config - Generate sample configuration"
+	@echo "  run-audio-router-with-config - Run with audio-router.json config"
+	@echo "  build-audio-router      - Build Audio Router Hub binary"
