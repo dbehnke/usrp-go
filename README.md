@@ -11,6 +11,7 @@ A Go library implementing the official USRP (Universal Software Radio Protocol) 
 ✅ **All Packet Types**: Voice, DTMF, Text, Ping, TLV, μ-law, ADPCM  
 ✅ **Amateur Radio Ready**: PTT control, callsign metadata, talk groups  
 ✅ **Audio Conversion**: FFmpeg integration for Opus/Ogg streaming formats  
+✅ **USRP Bridge Utility**: AllStarLink to internet service bridge with multi-destination support  
 ✅ **Production Tested**: Comprehensive test suite with all packet formats  
 ✅ **High Performance**: Efficient binary protocol handling  
 
@@ -87,6 +88,25 @@ usrpMessages, _ := converter.FormatToUSRP(opusData)
 ```
 
 See [`docs/AUDIO_CONVERSION.md`](docs/AUDIO_CONVERSION.md) for complete examples.
+
+### USRP Bridge Utility
+
+Connect AllStarLink nodes to internet services (WhoTalkie, Discord, etc.):
+
+```bash
+# Generate sample configuration
+make run-usrp-bridge-config
+
+# Edit usrp-bridge.json with your settings
+# Set your callsign, destinations, etc.
+
+# Run the bridge
+make run-usrp-bridge
+```
+
+**Architecture**: `AllStarLink Node <--USRP--> Bridge <--Opus--> Internet Services`
+
+See [`docs/USRP_BRIDGE.md`](docs/USRP_BRIDGE.md) for complete setup guide.
 
 ## Protocol Specification
 
@@ -219,11 +239,15 @@ usrp-go/
 ├── pkg/audio/             # Audio format conversion
 │   ├── converter.go       # FFmpeg integration
 │   └── converter_test.go  # Conversion tests
-├── cmd/examples/          # Demo applications
-│   ├── main.go           # Protocol compatibility tests
-│   └── audio_bridge.go   # Audio conversion examples
+├── cmd/examples/          # Protocol demo applications
+│   └── main.go           # Protocol compatibility tests
+├── cmd/audio-bridge/      # Audio conversion demos
+│   └── main.go           # Audio bridge examples
+├── cmd/usrp-bridge/       # USRP bridge utility
+│   └── main.go           # AllStarLink to internet bridge
 ├── docs/                  # Documentation
-│   └── AUDIO_CONVERSION.md # Audio conversion guide
+│   ├── AUDIO_CONVERSION.md # Audio conversion guide
+│   └── USRP_BRIDGE.md     # USRP bridge utility guide
 └── internal/transport/    # UDP transport layer (WIP)
     └── udp.go            # Network handling
 ```
@@ -242,6 +266,7 @@ This implementation prioritizes **exact compatibility** with existing USRP deplo
 Perfect for:
 - **AllStarLink node linking**
 - **Digital voice bridging**
+- **Internet service integration** (WhoTalkie, Discord)
 - **Experimental amateur radio protocols**
 - **Emergency communication systems**
 

@@ -38,17 +38,31 @@ run-demo:
 # Run audio conversion test
 run-audio-test:
 	@echo "Running audio conversion test..."
-	@go run cmd/examples/audio_bridge.go test
+	@go run cmd/audio-bridge/main.go test
 
 # Run audio bridge server
 run-audio-server:
 	@echo "Running audio bridge server..."
-	@go run cmd/examples/audio_bridge.go server
+	@go run cmd/audio-bridge/main.go server
 
 # Run audio bridge client  
 run-audio-client:
 	@echo "Running audio bridge client..."
-	@go run cmd/examples/audio_bridge.go client
+	@go run cmd/audio-bridge/main.go client
+
+# USRP Bridge utility targets
+run-usrp-bridge:
+	@echo "Running USRP bridge utility..."
+	@go run cmd/usrp-bridge/main.go
+
+run-usrp-bridge-config:
+	@echo "Generating USRP bridge configuration..."
+	@go run cmd/usrp-bridge/main.go -generate-config
+
+build-usrp-bridge:
+	@echo "Building USRP bridge binary..."
+	@mkdir -p bin
+	@go build -o bin/usrp-bridge cmd/usrp-bridge/main.go
 
 # Format code
 fmt:
@@ -100,7 +114,14 @@ help:
 	@echo "  clean        - Clean build artifacts"
 	@echo "  deps         - Install dependencies"
 	@echo "  release      - Create release binaries"
-	@echo "  help         - Show this help
-  run-audio-test    - Run audio conversion test
-  run-audio-server  - Run audio bridge server  
-  run-audio-client  - Run audio bridge client"
+	@echo "  help         - Show this help"
+	@echo ""
+	@echo "Audio Conversion:"
+	@echo "  run-audio-test    - Run audio conversion test"
+	@echo "  run-audio-server  - Run audio bridge server"
+	@echo "  run-audio-client  - Run audio bridge client"
+	@echo ""
+	@echo "USRP Bridge Utility:"
+	@echo "  run-usrp-bridge        - Run USRP bridge utility"
+	@echo "  run-usrp-bridge-config - Generate sample configuration"
+	@echo "  build-usrp-bridge      - Build USRP bridge binary"
