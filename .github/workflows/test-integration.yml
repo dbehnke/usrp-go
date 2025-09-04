@@ -25,7 +25,7 @@ jobs:
           # Install dagger using their installer into $HOME/.local/bin
           curl -fsSL https://dl.dagger.io/dagger/install.sh | BIN_DIR=$HOME/.local/bin sh
           export PATH="$HOME/.local/bin:$PATH"
-          $HOME/.local/bin/dagger --version
+          $HOME/.local/bin/dagger version
 
       - name: Build and run Dagger pipeline
         env:
