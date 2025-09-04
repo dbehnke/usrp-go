@@ -39,7 +39,7 @@ func runProtocolTests() error {
 		Header: usrp.NewHeader(usrp.USRP_TYPE_VOICE, 1234),
 	}
 	voiceMsg.Header.SetPTT(true)
-	
+
 	// Fill with test audio pattern (160 samples = 20ms at 8kHz)
 	for i := range voiceMsg.AudioData {
 		voiceMsg.AudioData[i] = int16(i * 100) // Test pattern
@@ -110,7 +110,7 @@ func runProtocolTests() error {
 	ulawMsg := &usrp.VoiceULawMessage{
 		Header: usrp.NewHeader(usrp.USRP_TYPE_VOICE_ULAW, 1111),
 	}
-	
+
 	// Fill with μ-law test pattern
 	for i := range ulawMsg.AudioData {
 		ulawMsg.AudioData[i] = byte(i % 256)
@@ -155,7 +155,7 @@ func runProtocolTests() error {
 // runFormatDemo shows all supported packet formats
 func runFormatDemo() {
 	fmt.Println("\n--- USRP Packet Format Demonstration ---")
-	
+
 	packetTypes := []struct {
 		name        string
 		packetType  usrp.PacketType
@@ -172,7 +172,7 @@ func runFormatDemo() {
 
 	fmt.Printf("%-12s %-5s %s\n", "TYPE", "ID", "DESCRIPTION")
 	fmt.Printf("%-12s %-5s %s\n", "----", "--", "-----------")
-	
+
 	for _, pt := range packetTypes {
 		fmt.Printf("%-12s %-5d %s\n", pt.name, pt.packetType, pt.description)
 	}

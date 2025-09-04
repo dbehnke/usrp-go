@@ -13,42 +13,42 @@ import (
 
 // Bot represents a Discord bot with voice capabilities
 type Bot struct {
-	session    *discordgo.Session
-	guildID    string
-	channelID  string
-	voiceConn  *discordgo.VoiceConnection
-	
+	session   *discordgo.Session
+	guildID   string
+	channelID string
+	voiceConn *discordgo.VoiceConnection
+
 	// Audio channels for bridging
-	AudioIn    chan []byte              // PCM audio from Discord
-	AudioOut   chan []byte              // PCM audio to Discord
-	
+	AudioIn  chan []byte // PCM audio from Discord
+	AudioOut chan []byte // PCM audio to Discord
+
 	// Control channels
-	stopChan   chan bool
-	running    bool
-	mutex      sync.Mutex
-	
+	stopChan chan bool
+	running  bool
+	mutex    sync.Mutex
+
 	// Configuration
-	config     *BotConfig
+	config *BotConfig
 }
 
 // BotConfig holds Discord bot configuration
 type BotConfig struct {
-	Token       string        // Discord bot token
-	GuildID     string        // Discord server (guild) ID
-	ChannelID   string        // Voice channel ID to join
-	SampleRate  int           // Audio sample rate (48000 for Discord)
-	Channels    int           // Audio channels (2 for Discord stereo)
-	FrameSize   time.Duration // Audio frame duration (20ms)
-	BufferSize  int           // Audio buffer size
+	Token      string        // Discord bot token
+	GuildID    string        // Discord server (guild) ID
+	ChannelID  string        // Voice channel ID to join
+	SampleRate int           // Audio sample rate (48000 for Discord)
+	Channels   int           // Audio channels (2 for Discord stereo)
+	FrameSize  time.Duration // Audio frame duration (20ms)
+	BufferSize int           // Audio buffer size
 }
 
 // DefaultBotConfig returns default configuration for Discord bot
 func DefaultBotConfig() *BotConfig {
 	return &BotConfig{
-		SampleRate:  48000,                  // Discord standard
-		Channels:    2,                      // Stereo
-		FrameSize:   20 * time.Millisecond,  // 20ms frames
-		BufferSize:  100,                    // Channel buffer size
+		SampleRate: 48000,                 // Discord standard
+		Channels:   2,                     // Stereo
+		FrameSize:  20 * time.Millisecond, // 20ms frames
+		BufferSize: 100,                   // Channel buffer size
 	}
 }
 
@@ -57,12 +57,12 @@ func NewBot(config *BotConfig) (*Bot, error) {
 	if config.Token == "" {
 		return nil, fmt.Errorf("Discord bot token is required")
 	}
-	
+
 	session, err := discordgo.New("Bot " + config.Token)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create Discord session: %w", err)
 	}
-	
+
 	bot := &Bot{
 		session:   session,
 		guildID:   config.GuildID,
@@ -72,10 +72,10 @@ func NewBot(config *BotConfig) (*Bot, error) {
 		stopChan:  make(chan bool, 1),
 		config:    config,
 	}
-	
+
 	// Set up event handlers
 	bot.setupEventHandlers()
-	
+
 	return bot, nil
 }
 
@@ -89,7 +89,7 @@ func (b *Bot) setupEventHandlers() {
 // onReady handles the ready event when bot connects
 func (b *Bot) onReady(s *discordgo.Session, event *discordgo.Ready) {
 	log.Printf("Discord bot ready: %s#%s", event.User.Username, event.User.Discriminator)
-	
+
 	// Set bot status
 	err := s.UpdateGameStatus(0, "Amateur Radio Bridge 📻")
 	if err != nil {
@@ -101,7 +101,7 @@ func (b *Bot) onReady(s *discordgo.Session, event *discordgo.Ready) {
 func (b *Bot) onVoiceStateUpdate(s *discordgo.Session, event *discordgo.VoiceStateUpdate) {
 	// Handle voice state changes if needed
 	if event.UserID == s.State.User.ID {
-		log.Printf("Bot voice state changed: Channel=%s, Guild=%s", 
+		log.Printf("Bot voice state changed: Channel=%s, Guild=%s",
 			event.ChannelID, event.GuildID)
 	}
 }
@@ -112,7 +112,7 @@ func (b *Bot) onMessageCreate(s *discordgo.Session, m *discordgo.MessageCreate) 
 	if m.Author.ID == s.State.User.ID {
 		return
 	}
-	
+
 	// Simple command handling
 	switch m.Content {
 	case "!join":
@@ -150,21 +150,21 @@ func (b *Bot) onMessageCreate(s *discordgo.Session, m *discordgo.MessageCreate) 
 func (b *Bot) Start(ctx context.Context) error {
 	b.mutex.Lock()
 	defer b.mutex.Unlock()
-	
+
 	if b.running {
 		return fmt.Errorf("bot is already running")
 	}
-	
+
 	// Open Discord session
 	if err := b.session.Open(); err != nil {
 		return fmt.Errorf("failed to open Discord session: %w", err)
 	}
-	
+
 	b.running = true
-	
+
 	// Start audio processing goroutine
 	go b.audioProcessor(ctx)
-	
+
 	log.Println("Discord bot started successfully")
 	return nil
 }
@@ -173,14 +173,14 @@ func (b *Bot) Start(ctx context.Context) error {
 func (b *Bot) Stop() error {
 	b.mutex.Lock()
 	defer b.mutex.Unlock()
-	
+
 	if !b.running {
 		return nil
 	}
-	
+
 	b.running = false
 	b.stopChan <- true
-	
+
 	// Leave voice channel if connected
 	if b.voiceConn != nil {
 		if err := b.voiceConn.Disconnect(); err != nil {
@@ -188,12 +188,12 @@ func (b *Bot) Stop() error {
 		}
 		b.voiceConn = nil
 	}
-	
+
 	// Close Discord session
 	if err := b.session.Close(); err != nil {
 		log.Printf("Error closing Discord session: %v", err)
 	}
-	
+
 	log.Println("Discord bot stopped")
 	return nil
 }
@@ -202,7 +202,7 @@ func (b *Bot) Stop() error {
 func (b *Bot) JoinVoiceChannel(guildID, channelID string) error {
 	b.mutex.Lock()
 	defer b.mutex.Unlock()
-	
+
 	// Leave current channel if connected
 	if b.voiceConn != nil {
 		if err := b.voiceConn.Disconnect(); err != nil {
@@ -210,17 +210,17 @@ func (b *Bot) JoinVoiceChannel(guildID, channelID string) error {
 		}
 		b.voiceConn = nil
 	}
-	
+
 	// Join new channel
 	voiceConn, err := b.session.ChannelVoiceJoin(guildID, channelID, false, true)
 	if err != nil {
 		return fmt.Errorf("failed to join voice channel: %w", err)
 	}
-	
+
 	b.voiceConn = voiceConn
 	b.guildID = guildID
 	b.channelID = channelID
-	
+
 	// Wait for connection to be ready
 	if voiceConn.Ready {
 		log.Printf("Successfully joined voice channel: %s", channelID)
@@ -232,10 +232,10 @@ func (b *Bot) JoinVoiceChannel(guildID, channelID string) error {
 		}
 		log.Printf("Successfully joined voice channel: %s", channelID)
 	}
-	
+
 	// Start receiving audio
 	go b.receiveAudio()
-	
+
 	return nil
 }
 
@@ -243,7 +243,7 @@ func (b *Bot) JoinVoiceChannel(guildID, channelID string) error {
 func (b *Bot) LeaveVoiceChannel() error {
 	b.mutex.Lock()
 	defer b.mutex.Unlock()
-	
+
 	if b.voiceConn != nil {
 		if err := b.voiceConn.Disconnect(); err != nil {
 			return fmt.Errorf("failed to disconnect from voice: %w", err)
@@ -251,7 +251,7 @@ func (b *Bot) LeaveVoiceChannel() error {
 		b.voiceConn = nil
 		log.Println("Left voice channel")
 	}
-	
+
 	return nil
 }
 
@@ -267,7 +267,7 @@ func (b *Bot) SendAudio(pcmData []byte) error {
 	if !b.IsConnected() {
 		return fmt.Errorf("not connected to voice channel")
 	}
-	
+
 	// Send audio to Discord (non-blocking)
 	select {
 	case b.AudioOut <- pcmData:
@@ -283,16 +283,16 @@ func (b *Bot) receiveAudio() {
 	if b.voiceConn == nil {
 		return
 	}
-	
+
 	// Note: Discord audio receiving is more complex in practice
 	// This is a simplified version for the bridge concept
 	log.Println("Audio receiver started (simplified implementation)")
-	
+
 	// In a real implementation, you would need to:
 	// 1. Handle Discord's voice packets
 	// 2. Decode Opus audio to PCM
 	// 3. Convert sample rates appropriately
-	
+
 	for {
 		select {
 		case <-b.stopChan:
@@ -308,7 +308,7 @@ func (b *Bot) receiveAudio() {
 func (b *Bot) audioProcessor(ctx context.Context) {
 	ticker := time.NewTicker(b.config.FrameSize)
 	defer ticker.Stop()
-	
+
 	for {
 		select {
 		case <-ctx.Done():

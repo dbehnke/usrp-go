@@ -27,21 +27,21 @@ type Config struct {
 	// USRP listening configuration
 	USRPListenPort int    `json:"usrp_listen_port"`
 	USRPListenAddr string `json:"usrp_listen_addr"`
-	
-	// AllStarLink return configuration  
+
+	// AllStarLink return configuration
 	AllStarHost string `json:"allstar_host"`
 	AllStarPort int    `json:"allstar_port"`
-	
+
 	// Destination services
 	Destinations []DestinationConfig `json:"destinations"`
-	
+
 	// Audio conversion settings
 	AudioConfig AudioConfig `json:"audio_config"`
-	
+
 	// Logging and monitoring
 	LogLevel    string `json:"log_level"`
 	MetricsPort int    `json:"metrics_port"`
-	
+
 	// Amateur radio settings
 	StationCall string `json:"station_call"`
 	TalkGroup   uint32 `json:"talk_group"`
@@ -50,20 +50,20 @@ type Config struct {
 // DestinationConfig defines a destination service configuration
 type DestinationConfig struct {
 	Name     string `json:"name"`
-	Type     string `json:"type"`     // "discord", "whotalkie", "generic"
+	Type     string `json:"type"` // "discord", "whotalkie", "generic"
 	Host     string `json:"host"`
 	Port     int    `json:"port"`
 	Protocol string `json:"protocol"` // "udp", "tcp", "websocket"
 	Format   string `json:"format"`   // "opus", "ogg", "raw"
 	Enabled  bool   `json:"enabled"`
-	
+
 	// Service-specific settings
 	Settings map[string]interface{} `json:"settings,omitempty"`
 }
 
 // AudioConfig defines audio processing settings
 type AudioConfig struct {
-	EnableConversion bool `json:"enable_conversion"`
+	EnableConversion bool   `json:"enable_conversion"`
 	OutputFormat     string `json:"output_format"` // "opus", "ogg"
 	Bitrate          int    `json:"bitrate"`       // kbps
 	SampleRate       int    `json:"sample_rate"`   // Hz
@@ -74,15 +74,15 @@ type AudioConfig struct {
 type Bridge struct {
 	config    *Config
 	converter audio.Converter
-	
+
 	// Network connections
 	usrpConn     *net.UDPConn
 	allstarConn  *net.UDPConn
 	destinations map[string]*net.UDPConn
-	
+
 	// Metrics and monitoring
 	stats *BridgeStats
-	
+
 	// Control channels
 	ctx    context.Context
 	cancel context.CancelFunc
@@ -90,16 +90,16 @@ type Bridge struct {
 
 // BridgeStats tracks bridge performance metrics
 type BridgeStats struct {
-	USRPPacketsReceived    uint64 `json:"usrp_packets_received"`
-	USRPPacketsSent        uint64 `json:"usrp_packets_sent"`
-	OpusPacketsGenerated   uint64 `json:"opus_packets_generated"`
-	OpusPacketsForwarded   uint64 `json:"opus_packets_forwarded"`
-	ConversionErrors       uint64 `json:"conversion_errors"`
-	NetworkErrors          uint64 `json:"network_errors"`
-	ActiveTransmissions    uint64 `json:"active_transmissions"`
-	LastActivityTime       int64  `json:"last_activity_time"`
-	BytesReceived          uint64 `json:"bytes_received"`
-	BytesSent              uint64 `json:"bytes_sent"`
+	USRPPacketsReceived  uint64 `json:"usrp_packets_received"`
+	USRPPacketsSent      uint64 `json:"usrp_packets_sent"`
+	OpusPacketsGenerated uint64 `json:"opus_packets_generated"`
+	OpusPacketsForwarded uint64 `json:"opus_packets_forwarded"`
+	ConversionErrors     uint64 `json:"conversion_errors"`
+	NetworkErrors        uint64 `json:"network_errors"`
+	ActiveTransmissions  uint64 `json:"active_transmissions"`
+	LastActivityTime     int64  `json:"last_activity_time"`
+	BytesReceived        uint64 `json:"bytes_received"`
+	BytesSent            uint64 `json:"bytes_sent"`
 }
 
 // Default configuration
@@ -107,7 +107,7 @@ func defaultConfig() *Config {
 	return &Config{
 		USRPListenPort: 12345,
 		USRPListenAddr: "0.0.0.0",
-		AllStarHost:    "127.0.0.1", 
+		AllStarHost:    "127.0.0.1",
 		AllStarPort:    12346,
 		Destinations: []DestinationConfig{
 			{
@@ -182,10 +182,10 @@ func main() {
 	fmt.Printf("🎧 USRP Listen: %s:%d\n", config.USRPListenAddr, config.USRPListenPort)
 	fmt.Printf("📡 AllStarLink: %s:%d\n", config.AllStarHost, config.AllStarPort)
 	fmt.Printf("🎵 Audio: %s @ %d kbps\n", config.AudioConfig.OutputFormat, config.AudioConfig.Bitrate)
-	
+
 	for i, dest := range config.Destinations {
 		if dest.Enabled {
-			fmt.Printf("🎯 Destination %d: %s (%s://%s:%d, format: %s)\n", 
+			fmt.Printf("🎯 Destination %d: %s (%s://%s:%d, format: %s)\n",
 				i+1, dest.Name, dest.Protocol, dest.Host, dest.Port, dest.Format)
 		}
 	}
@@ -215,7 +215,7 @@ func main() {
 
 	// Handle signals
 	signal.Notify(sigChan, syscall.SIGUSR1)
-	
+
 	for {
 		sig := <-sigChan
 		switch sig {
@@ -231,7 +231,7 @@ func main() {
 // NewBridge creates a new USRP bridge instance
 func NewBridge(config *Config) (*Bridge, error) {
 	ctx, cancel := context.WithCancel(context.Background())
-	
+
 	bridge := &Bridge{
 		config:       config,
 		destinations: make(map[string]*net.UDPConn),
@@ -251,7 +251,7 @@ func NewBridge(config *Config) (*Bridge, error) {
 		default:
 			return nil, fmt.Errorf("unsupported audio format: %s", config.AudioConfig.OutputFormat)
 		}
-		
+
 		if err != nil {
 			return nil, fmt.Errorf("failed to create audio converter: %w", err)
 		}
@@ -263,7 +263,7 @@ func NewBridge(config *Config) (*Bridge, error) {
 // Start initializes and starts the bridge
 func (b *Bridge) Start() error {
 	// Setup USRP listener
-	usrpAddr, err := net.ResolveUDPAddr("udp", fmt.Sprintf("%s:%d", 
+	usrpAddr, err := net.ResolveUDPAddr("udp", fmt.Sprintf("%s:%d",
 		b.config.USRPListenAddr, b.config.USRPListenPort))
 	if err != nil {
 		return fmt.Errorf("failed to resolve USRP address: %w", err)
@@ -452,7 +452,7 @@ func (b *Bridge) forwardToDestinations(voiceMsg *usrp.VoiceMessage) error {
 
 		// Format the data based on destination requirements
 		finalData := audioData
-		
+
 		// Add any destination-specific formatting here
 		switch destConfig.Type {
 		case "whotalkie":
@@ -484,11 +484,11 @@ func (b *Bridge) forwardToDestinations(voiceMsg *usrp.VoiceMessage) error {
 func (b *Bridge) formatForWhoTalkie(audioData []byte, voiceMsg *usrp.VoiceMessage) []byte {
 	// WhoTalkie might expect a specific packet format
 	// This is a placeholder - adjust based on actual WhoTalkie protocol
-	
+
 	// For now, just return the raw Opus data
 	// In a real implementation, you might wrap it in a JSON message or
 	// add headers with metadata like callsign, PTT state, etc.
-	
+
 	return audioData
 }
 
@@ -496,13 +496,13 @@ func (b *Bridge) formatForWhoTalkie(audioData []byte, voiceMsg *usrp.VoiceMessag
 func (b *Bridge) PrintStats() {
 	fmt.Println("\n📊 Bridge Statistics")
 	fmt.Println("==================")
-	fmt.Printf("USRP Packets: %d received, %d sent\n", 
+	fmt.Printf("USRP Packets: %d received, %d sent\n",
 		b.stats.USRPPacketsReceived, b.stats.USRPPacketsSent)
-	fmt.Printf("Opus Packets: %d generated, %d forwarded\n", 
+	fmt.Printf("Opus Packets: %d generated, %d forwarded\n",
 		b.stats.OpusPacketsGenerated, b.stats.OpusPacketsForwarded)
-	fmt.Printf("Errors: %d conversion, %d network\n", 
+	fmt.Printf("Errors: %d conversion, %d network\n",
 		b.stats.ConversionErrors, b.stats.NetworkErrors)
-	fmt.Printf("Traffic: %d bytes received, %d bytes sent\n", 
+	fmt.Printf("Traffic: %d bytes received, %d bytes sent\n",
 		b.stats.BytesReceived, b.stats.BytesSent)
 	fmt.Printf("Last Activity: %s\n", time.Unix(b.stats.LastActivityTime, 0).Format(time.RFC3339))
 	fmt.Println()
@@ -528,12 +528,12 @@ func loadConfig(filename string) (*Config, error) {
 // generateSampleConfig creates a sample configuration file
 func generateSampleConfig() {
 	config := defaultConfig()
-	
+
 	// Add more destination examples
-	config.Destinations = append(config.Destinations, 
+	config.Destinations = append(config.Destinations,
 		DestinationConfig{
 			Name:     "discord-bot",
-			Type:     "discord", 
+			Type:     "discord",
 			Host:     "127.0.0.1",
 			Port:     8081,
 			Protocol: "udp",
@@ -549,7 +549,7 @@ func generateSampleConfig() {
 			Type:     "generic",
 			Host:     "backup.example.com",
 			Port:     9999,
-			Protocol: "udp", 
+			Protocol: "udp",
 			Format:   "ogg",
 			Enabled:  false,
 		})

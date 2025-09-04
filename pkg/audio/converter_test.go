@@ -20,11 +20,11 @@ func TestOpusConverter(t *testing.T) {
 	voiceMsg := &usrp.VoiceMessage{
 		Header: usrp.NewHeader(usrp.USRP_TYPE_VOICE, 1234),
 	}
-	
+
 	// Fill with test audio pattern (sine wave-like)
 	for i := range voiceMsg.AudioData {
 		// Simple test pattern
-		voiceMsg.AudioData[i] = int16(1000 * (i % 100 - 50)) // Varies between -50k to +50k
+		voiceMsg.AudioData[i] = int16(1000 * (i%100 - 50)) // Varies between -50k to +50k
 	}
 
 	// Convert to Opus
@@ -67,7 +67,7 @@ func TestOggOpusConverter(t *testing.T) {
 	voiceMsg := &usrp.VoiceMessage{
 		Header: usrp.NewHeader(usrp.USRP_TYPE_VOICE, 5678),
 	}
-	
+
 	// Fill with different test pattern
 	for i := range voiceMsg.AudioData {
 		voiceMsg.AudioData[i] = int16(500 * (i % 160)) // Sawtooth pattern

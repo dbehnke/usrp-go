@@ -85,7 +85,7 @@ func testOpusConversion() error {
 	voiceMsg := &usrp.VoiceMessage{
 		Header: usrp.NewHeader(usrp.USRP_TYPE_VOICE, 1234),
 	}
-	
+
 	// Generate test pattern (20ms at 8kHz = 160 samples)
 	for i := range voiceMsg.AudioData {
 		// Simple linear ramp for testing (could be sine wave with math.Sin)
@@ -99,7 +99,7 @@ func testOpusConversion() error {
 	if err != nil {
 		return fmt.Errorf("USRP to Opus failed: %w", err)
 	}
-	fmt.Printf("🎵 Converted to Opus: %d bytes (compression: %.1f%%)\n", 
+	fmt.Printf("🎵 Converted to Opus: %d bytes (compression: %.1f%%)\n",
 		len(opusData), float64(len(opusData))*100.0/float64(len(voiceMsg.AudioData)*2))
 
 	// Convert back to USRP
@@ -123,7 +123,7 @@ func testOggConversion() error {
 	voiceMsg := &usrp.VoiceMessage{
 		Header: usrp.NewHeader(usrp.USRP_TYPE_VOICE, 5678),
 	}
-	
+
 	// Fill with test pattern
 	for i := range voiceMsg.AudioData {
 		voiceMsg.AudioData[i] = int16(1000 * (i % 20)) // Pattern for testing
@@ -270,7 +270,7 @@ func runServer() {
 			}
 
 			packetCount++
-			fmt.Printf("📦 Packet %d: USRP %d bytes, PTT=%v\n", 
+			fmt.Printf("📦 Packet %d: USRP %d bytes, PTT=%v\n",
 				packetCount, n, voiceMsg.Header.IsPTT())
 
 			// Convert to Opus
