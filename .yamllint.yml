@@ -1,0 +1,5 @@
+extends: default
+
+rules:
+  # Project prefers to ignore long lines in CI/workflow files
+  line-length: disable
