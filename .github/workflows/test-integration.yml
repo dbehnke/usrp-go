@@ -19,16 +19,13 @@ jobs:
         with:
           go-version: '1.25'
 
-      - name: Install Dagger CLI (from GitHub release)
-        env:
-          DAGGER_VERSION: '0.18.17'
+      - name: Install Dagger CLI (installer)
         run: |
           set -eux
-          # Download Dagger CLI release tarball and extract the 'dagger' binary
-          URL="https://github.com/dagger/dagger/releases/download/v${DAGGER_VERSION}/cli-linux-amd64.tar.gz"
-          curl -fsSL "$URL" -o /tmp/dagger.tar.gz
-          sudo tar -C /usr/local/bin -xzf /tmp/dagger.tar.gz
-          dagger --version
+          # Install dagger using their installer into $HOME/.local/bin
+          curl -fsSL https://dl.dagger.io/dagger/install.sh | BIN_DIR=$HOME/.local/bin sh
+          export PATH="$HOME/.local/bin:$PATH"
+          $HOME/.local/bin/dagger --version
 
       - name: Build and run Dagger pipeline
         env:
