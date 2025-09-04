@@ -59,7 +59,10 @@ spec:
           exec:
             command:
             - nc
+            - -u
             - -z
+            - -w
+            - "1"
             - localhost
             - "34001"
           initialDelaySeconds: 10
@@ -143,10 +146,13 @@ spec:
         livenessProbe:
           exec:
             command:
-            - nc
-            - -z
-            - localhost
-            - "34002"
+              - nc
+              - -u
+              - -z
+              - -w
+              - "1"
+              - localhost
+              - "34002"
           initialDelaySeconds: 10
           periodSeconds: 30
 
