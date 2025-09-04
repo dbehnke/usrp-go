@@ -112,11 +112,12 @@ func NewStreamingConverter(config *ConverterConfig) (*StreamingConverter, error)
 func (sc *StreamingConverter) initFFmpegProcesses(config *ConverterConfig) error {
 	// USRP (PCM) -> Target format
 	sc.toFormatCmd = exec.Command("ffmpeg",
-		"-f", "s16le",              // Input: signed 16-bit little-endian
+		"-y",                      // Overwrite output without prompting
+		"-f", "s16le",             // Input: signed 16-bit little-endian
 		"-ar", fmt.Sprintf("%d", config.InputRate),  // Input sample rate
 		"-ac", fmt.Sprintf("%d", config.Channels),   // Input channels
-		"-i", "pipe:0",             // Read from stdin
-		"-f", config.OutputFormat,  // Output format
+		"-i", "pipe:0",            // Read from stdin
+		"-f", config.OutputFormat, // Output format
 		"-ar", fmt.Sprintf("%d", config.OutputRate), // Output sample rate
 		"-ac", fmt.Sprintf("%d", config.Channels),   // Output channels
 	)
@@ -134,6 +135,7 @@ func (sc *StreamingConverter) initFFmpegProcesses(config *ConverterConfig) error
 	
 	// Target format -> USRP (PCM)
 	sc.fromFormatCmd = exec.Command("ffmpeg",
+		"-y",                       // Overwrite output without prompting
 		"-f", config.InputFormat,   // Input format
 		"-i", "pipe:0",            // Read from stdin
 		"-f", "s16le",             // Output: signed 16-bit little-endian

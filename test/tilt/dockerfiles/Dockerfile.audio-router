@@ -1,7 +1,7 @@
 # Multi-stage Dockerfile for Audio Router Hub with live reload support
 
 FROM golang:1.25-alpine AS base
-RUN apk add --no-cache git ca-certificates tzdata
+RUN apk add --no-cache git ca-certificates tzdata ffmpeg
 WORKDIR /app
 
 # Copy go mod files

@@ -10,8 +10,8 @@
     "processing_delay": 10,
     "max_concurrent_tx": 3,
     "tx_timeout_seconds": 30,
-    "enable_conversion": true,
-    "default_format": "opus"
+    "enable_conversion": false,
+    "default_format": "pcm"
   },
   "routing": {
     "prevent_loops": true,
@@ -74,10 +74,10 @@
         "remote_port": 8080
       },
       "audio": {
-        "format": "opus",
-        "sample_rate": 48000,
+        "format": "pcm",
+        "sample_rate": 8000,
         "channels": 1,
-        "bitrate": 64000
+        "bitrate": 0
       },
       "routing": {
         "can_send": true,

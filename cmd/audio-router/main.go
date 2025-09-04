@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"net/http"
 	"os"
 	"os/signal"
 	"sync"
@@ -1113,15 +1114,65 @@ func (r *AudioRouter) startStatusServer() {
 	addr := fmt.Sprintf(":%d", r.config.Router.StatusPort)
 	log.Printf("Starting HTTP status server on %s", addr)
 	
-	// This would implement a full HTTP server with JSON metrics
-	// For now, just log that it would be running
-	log.Printf("Status server would run on port %d", r.config.Router.StatusPort)
+	// Create HTTP server
+	mux := http.NewServeMux()
 	
-	// In a complete implementation, this would serve:
-	// GET /status - JSON status and statistics
-	// GET /services - List of services and their status  
-	// GET /metrics - Prometheus-style metrics
-	// GET /config - Current configuration (sanitized)
+	// Status endpoint
+	mux.HandleFunc("/status", func(w http.ResponseWriter, req *http.Request) {
+		r.statsMux.RLock()
+		stats := r.stats
+		r.statsMux.RUnlock()
+		
+		r.servicesMux.RLock()
+		services := make([]map[string]interface{}, 0, len(r.services))
+		for id, conn := range r.services {
+			service := map[string]interface{}{
+				"id":       id,
+				"enabled":  conn.Instance.Enabled,
+				"connected": conn.Connection != nil,
+				"type":     string(conn.Instance.Type),
+			}
+			services = append(services, service)
+		}
+		r.servicesMux.RUnlock()
+		
+		status := map[string]interface{}{
+			"router": map[string]interface{}{
+				"name":       r.config.Router.Name,
+				"status":     "running",
+				"uptime":     time.Since(stats.UptimeStart).String(),
+				"status_port": r.config.Router.StatusPort,
+			},
+			"services": services,
+			"statistics": map[string]interface{}{
+				"total_messages":     stats.TotalMessages,
+				"routed_messages":    stats.RoutedMessages,
+				"dropped_messages":   stats.DroppedMessages,
+				"conversion_errors":  stats.ConversionErrors,
+				"active_services":    stats.ActiveServices,
+				"active_transmissions": stats.ActiveTransmissions,
+			},
+		}
+		
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(status)
+	})
+	
+	// Health check endpoint
+	mux.HandleFunc("/health", func(w http.ResponseWriter, req *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(map[string]string{"status": "healthy"})
+	})
+	
+	server := &http.Server{
+		Addr:    addr,
+		Handler: mux,
+	}
+	
+	log.Printf("Status server listening on %s", addr)
+	if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+		log.Printf("HTTP server error: %v", err)
+	}
 }
 
 // PrintStats displays current router statistics

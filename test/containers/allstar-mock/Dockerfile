@@ -9,7 +9,6 @@ FROM alpine:latest
 RUN apk --no-cache add ca-certificates tzdata
 WORKDIR /app
 COPY --from=builder /build/allstar-mock ./
-COPY audio-patterns/ ./patterns/
 
 # Create non-root user
 RUN addgroup -g 1001 -S appuser && \

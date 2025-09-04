@@ -290,7 +290,6 @@ func (a *AllStarMock) generateWhiteNoise(audioData []int16) {
 
 func (a *AllStarMock) generateFrequencySweep(audioData []int16) {
 	// Sweep from 300Hz to 3kHz over 10 seconds
-	sweepDuration := 10.0 * float64(a.sampleRate) // 10 seconds worth of samples
 	startFreq := 300.0
 	endFreq := 3000.0
 	
@@ -304,7 +303,6 @@ func (a *AllStarMock) generateFrequencySweep(audioData []int16) {
 func (a *AllStarMock) generateDTMF(audioData []int16) {
 	// Generate DTMF sequence: "1234567890*#"
 	dtmfDigits := "1234567890*#"
-	digitDuration := 2 * a.sampleRate // 2 seconds per digit
 	
 	elapsed := int(time.Since(a.stats.startTime).Seconds()) 
 	digitIndex := (elapsed / 2) % len(dtmfDigits)

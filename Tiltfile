@@ -6,11 +6,11 @@ load('ext://restart_process', 'docker_build_with_restart')
 load('ext://helm_resource', 'helm_resource', 'helm_repo')
 
 # Configuration
-config.define_bool("enable_audio_generator", default=True)
-config.define_bool("enable_monitoring", default=True) 
-config.define_bool("enable_debug_logging", default=False)
-config.define_string("audio_pattern", default="sine_440hz")
-config.define_string("test_duration", default="300") # 5 minutes
+config.define_bool("enable_audio_generator")
+config.define_bool("enable_monitoring") 
+config.define_bool("enable_debug_logging")
+config.define_string("audio_pattern")
+config.define_string("test_duration")
 
 cfg = config.parse()
 
@@ -35,21 +35,21 @@ Access Points:
   📈 Grafana: http://localhost:3000 (admin/admin)
   🔍 Prometheus: http://localhost:9091
 """.format(
-    "Enabled" if cfg.get("enable_audio_generator") else "Disabled",
-    "Enabled" if cfg.get("enable_monitoring") else "Disabled", 
-    "Enabled" if cfg.get("enable_debug_logging") else "Disabled",
-    cfg.get("audio_pattern"),
-    cfg.get("test_duration")
+    "Enabled" if cfg.get("enable_audio_generator", True) else "Disabled",
+    "Enabled" if cfg.get("enable_monitoring", True) else "Disabled", 
+    "Enabled" if cfg.get("enable_debug_logging", False) else "Disabled",
+    cfg.get("audio_pattern", "sine_440hz"),
+    cfg.get("test_duration", "300")
 ))
 
 # Build configurations for all services
 def build_audio_router():
     """Build the Audio Router Hub with live reload"""
-    docker_build(
+    docker_build_with_restart(
         'audio-router',
         context='.',
         dockerfile='./test/tilt/dockerfiles/Dockerfile.audio-router',
-        # Live update: rebuild only on Go file changes
+        entrypoint='/app/audio-router',
         live_update=[
             sync('./cmd/audio-router/', '/app/cmd/audio-router/'),
             sync('./pkg/', '/app/pkg/'),
@@ -58,42 +58,45 @@ def build_audio_router():
                 './pkg/usrp/',
                 './pkg/audio/', 
                 './pkg/discord/'
-            ]),
-            restart_container()
+            ])
         ],
         target='dev'  # Multi-stage build target for development
     )
 
 def build_allstar_mock():
     """Build AllStarLink mock server with live reload"""
-    docker_build(
+    docker_build_with_restart(
         'allstar-mock',
         context='./test/containers/allstar-mock',
         dockerfile='./test/tilt/dockerfiles/Dockerfile.allstar-mock',
+        entrypoint='/app/allstar-mock',
         live_update=[
             sync('./test/containers/allstar-mock/', '/app/'),
             run('go build -o /app/allstar-mock /app/allstar-mock.go', trigger=[
                 './test/containers/allstar-mock/allstar-mock.go'
-            ]),
-            restart_container()
+            ])
         ]
     )
 
 def build_whotalkie_mock():
     """Build WhoTalkie mock service"""
-    docker_build(
-        'whotalkie-mock',
-        context='./test/tilt/services/whotalkie-mock',
-        dockerfile='./test/tilt/dockerfiles/Dockerfile.whotalkie-mock'
-    )
+    # TODO: Create whotalkie-mock service files
+    # docker_build(
+    #     'whotalkie-mock',
+    #     context='./test/tilt/services/whotalkie-mock',
+    #     dockerfile='./test/tilt/dockerfiles/Dockerfile.whotalkie-mock'
+    # )
+    pass
 
 def build_discord_mock():
     """Build Discord voice gateway mock"""
-    docker_build(
-        'discord-mock', 
-        context='./test/tilt/services/discord-mock',
-        dockerfile='./test/tilt/dockerfiles/Dockerfile.discord-mock'
-    )
+    # TODO: Create discord-mock service files
+    # docker_build(
+    #     'discord-mock',
+    #     context='./test/tilt/services/discord-mock',
+    #     dockerfile='./test/tilt/dockerfiles/Dockerfile.discord-mock'
+    # )
+    pass
 
 def build_audio_generator():
     """Build audio test signal generator"""
@@ -110,8 +113,9 @@ build_allstar_mock()
 build_whotalkie_mock()
 build_discord_mock()
 
-if cfg.get("enable_audio_generator"):
-    build_audio_generator()
+# TODO: Uncomment when audio-generator files are created
+# if cfg.get("enable_audio_generator", True):
+#     build_audio_generator()
 
 # Deploy Kubernetes resources
 print("🚀 Deploying Kubernetes resources...")
@@ -136,47 +140,51 @@ k8s_resource('allstar-mock-2',
 )
 
 # WhoTalkie Mock Services
-k8s_yaml('./test/tilt/k8s/whotalkie-mocks.yaml') 
-k8s_resource('whotalkie-mock-1',
-    port_forwards='8080:8080',
-    labels=['mocks', 'whotalkie']
-)
-k8s_resource('whotalkie-mock-2',
-    port_forwards='8081:8081', 
-    labels=['mocks', 'whotalkie']
-)
+# TODO: Create whotalkie-mocks.yaml
+# k8s_yaml('./test/tilt/k8s/whotalkie-mocks.yaml') 
+# k8s_resource('whotalkie-mock-1',
+#     port_forwards='8080:8080',
+#     labels=['mocks', 'whotalkie']
+# )
+# k8s_resource('whotalkie-mock-2',
+#     port_forwards='8081:8081', 
+#     labels=['mocks', 'whotalkie']
+# )
 
 # Discord Mock Service
-k8s_yaml('./test/tilt/k8s/discord-mock.yaml')
-k8s_resource('discord-mock',
-    port_forwards='8082:8082',
-    labels=['mocks', 'discord'] 
-)
+# TODO: Create discord-mock.yaml
+# k8s_yaml('./test/tilt/k8s/discord-mock.yaml')
+# k8s_resource('discord-mock',
+#     port_forwards='8082:8082',
+#     labels=['mocks', 'discord'] 
+# )
 
 # Audio Test Generator (optional)
-if cfg.get("enable_audio_generator"):
-    k8s_yaml('./test/tilt/k8s/audio-generator.yaml')
-    k8s_resource('audio-generator',
-        labels=['testing', 'audio']
-    )
+# TODO: Create audio-generator.yaml and Dockerfile.audio-generator
+# if cfg.get("enable_audio_generator", True):
+#     k8s_yaml('./test/tilt/k8s/audio-generator.yaml')
+#     k8s_resource('audio-generator',
+#         labels=['testing', 'audio']
+#     )
 
 # Monitoring Stack (optional)
-if cfg.get("enable_monitoring"):
-    print("📊 Setting up monitoring stack...")
-    
-    # Prometheus
-    k8s_yaml('./test/tilt/k8s/prometheus.yaml')
-    k8s_resource('prometheus',
-        port_forwards='9091:9090',
-        labels=['monitoring']
-    )
-    
-    # Grafana  
-    k8s_yaml('./test/tilt/k8s/grafana.yaml')
-    k8s_resource('grafana',
-        port_forwards='3000:3000',
-        labels=['monitoring']
-    )
+# TODO: Create prometheus.yaml and grafana.yaml
+# if cfg.get("enable_monitoring", True):
+#     print("📊 Setting up monitoring stack...")
+#     
+#     # Prometheus
+#     k8s_yaml('./test/tilt/k8s/prometheus.yaml')
+#     k8s_resource('prometheus',
+#         port_forwards='9091:9090',
+#         labels=['monitoring']
+#     )
+#     
+#     # Grafana  
+#     k8s_yaml('./test/tilt/k8s/grafana.yaml')
+#     k8s_resource('grafana',
+#         port_forwards='3000:3000',
+#         labels=['monitoring']
+#     )
 
 # Development helpers and local resources
 print("🛠️  Setting up development helpers...")
@@ -184,7 +192,7 @@ print("🛠️  Setting up development helpers...")
 # Integration test runner
 local_resource(
     'integration-tests',
-    cmd='./test/tilt/scripts/run-tests.sh',
+    cmd='bash ./test/tilt/scripts/run-tests.sh',
     deps=['./test/tilt/scripts/', './test/containers/'],
     labels=['testing'],
     allow_parallel=True
@@ -193,7 +201,7 @@ local_resource(
 # Audio quality validator  
 local_resource(
     'audio-quality-check',
-    cmd='./test/tilt/scripts/validate-audio-quality.sh',
+    cmd='bash ./test/tilt/scripts/validate-audio-quality.sh',
     deps=['./test/tilt/scripts/'],
     labels=['testing', 'audio'],
     auto_init=False,  # Run manually
@@ -203,7 +211,7 @@ local_resource(
 # Log aggregation and analysis
 local_resource(
     'log-analysis',
-    cmd='./test/tilt/scripts/analyze-logs.sh', 
+    cmd='bash ./test/tilt/scripts/analyze-logs.sh', 
     deps=['./test/tilt/scripts/'],
     labels=['debugging'],
     auto_init=False,
@@ -213,7 +221,7 @@ local_resource(
 # Network traffic analysis
 local_resource(
     'network-analysis',
-    cmd='./test/tilt/scripts/capture-traffic.sh',
+    cmd='bash ./test/tilt/scripts/capture-traffic.sh',
     deps=['./test/tilt/scripts/'],
     labels=['debugging', 'network'],
     auto_init=False,
@@ -223,20 +231,21 @@ local_resource(
 # Performance profiling
 local_resource(
     'performance-profile',
-    cmd='./test/tilt/scripts/profile-performance.sh',
+    cmd='bash ./test/tilt/scripts/profile-performance.sh',
     deps=['./test/tilt/scripts/'],
     labels=['performance'],
     auto_init=False,
     trigger_mode=TRIGGER_MODE_MANUAL
 )
 
-# Configuration validator
-local_resource(
-    'config-validator',
-    cmd='go run ./cmd/audio-router/main.go -config ./test/tilt/configs/audio-router-dev.json -validate-only',
-    deps=['./cmd/audio-router/', './test/tilt/configs/'],
-    labels=['validation']
-)
+# Configuration validator - REMOVED: no validate-only flag exists
+# Integration tests already validate configuration
+# local_resource(
+#     'config-validator',
+#     cmd='go run ./cmd/audio-router/main.go -config ./test/tilt/configs/audio-router-dev.json -validate-only',
+#     deps=['./cmd/audio-router/', './test/tilt/configs/'],
+#     labels=['validation']
+# )
 
 # Development workflow helpers
 print("⚡ Setting up development workflow...")
@@ -270,9 +279,10 @@ print("📋 Organizing service groups...")
 k8s_resource('audio-router', labels=['core', 'audio-routing'])
 k8s_resource('allstar-mock-1', labels=['mocks', 'amateur-radio'])  
 k8s_resource('allstar-mock-2', labels=['mocks', 'amateur-radio'])
-k8s_resource('whotalkie-mock-1', labels=['mocks', 'internet-services'])
-k8s_resource('whotalkie-mock-2', labels=['mocks', 'internet-services']) 
-k8s_resource('discord-mock', labels=['mocks', 'discord'])
+# TODO: Uncomment when whotalkie-mock services are created
+# k8s_resource('whotalkie-mock-1', labels=['mocks', 'internet-services'])
+# k8s_resource('whotalkie-mock-2', labels=['mocks', 'internet-services']) 
+# k8s_resource('discord-mock', labels=['mocks', 'discord'])
 
 # Print helpful information
 print("""
@@ -314,7 +324,7 @@ if config.main_dir.endswith('development') or config.main_dir.endswith('dev'):
     # Enable debug logging
     local_resource(
         'enable-debug-logging',
-        cmd='kubectl patch deployment audio-router -p \\'{"spec":{"template":{"spec":{"containers":[{"name":"audio-router","env":[{"name":"DEBUG","value":"true"}]}]}}}}\\' || true',
+        cmd="kubectl patch deployment audio-router -p '{\"spec\":{\"template\":{\"spec\":{\"containers\":[{\"name\":\"audio-router\",\"env\":[{\"name\":\"DEBUG\",\"value\":\"true\"}]}]}}}}' || true",
         labels=['dev-tools']
     )
     
