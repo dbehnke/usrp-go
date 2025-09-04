@@ -1,14 +1,14 @@
----
+version: '3.8'
 
 services:
   audio-router:
     build:
-      context: .
+      context: ../..
       dockerfile: test/tilt/dockerfiles/Dockerfile.audio-router
     ports:
       - "9090:9090"
     volumes:
-      - ./configs/audio-router-test.json:/app/config.json
+      - ./configs/audio-router-test.json:/app/config.json:ro
     command: ["/app/audio-router", "-config", "/app/config.json", "-verbose"]
 
   allstar-mock-1:
@@ -33,7 +33,7 @@ services:
     build: ../containers/audio-generator
     volumes:
       - ./audio-samples:/output
-      - ./test-patterns:/patterns
+      - ./test-patterns:/patterns:ro
     command: ["/usr/local/bin/generate-test-audio.sh", "/output"]
 
   test-validator:
@@ -47,15 +47,14 @@ services:
       - discord-mock
     volumes:
       - ./test-results:/results
-      - ./test-configs:/configs
-  # Use the image CMD which runs /usr/local/bin/run-integration-tests.sh
+      - ./test-configs:/configs:ro
 
   prometheus:
     image: prom/prometheus:latest
     ports:
       - "9091:9090"
     volumes:
-      - ./configs/prometheus.yml:/etc/prometheus
+      - ./configs/prometheus.yml:/etc/prometheus/prometheus.yml:ro
     command:
       - "--config.file=/etc/prometheus/prometheus.yml"
       - "--storage.tsdb.path=/prometheus"
@@ -67,7 +66,7 @@ services:
     environment:
       - GF_SECURITY_ADMIN_PASSWORD=admin
     volumes:
-      - ./configs/grafana:/etc/grafana/provisioning
+      - ./configs/grafana:/etc/grafana/provisioning:ro
 
 volumes:
   prometheus-data: {}
