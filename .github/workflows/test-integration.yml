@@ -29,10 +29,19 @@ jobs:
           sudo apt-get install -y curl ca-certificates git make build-essential
           # Install just if not available (best-effort)
           if ! command -v just >/dev/null 2>&1; then
-            curl -fsSL https://github.com/casey/just/releases/download/v0.11.0/just-v0.11.0-x86_64-unknown-linux-musl.tar.gz \
-              | sudo tar -xz -C /usr/local/bin --strip-components=1 just-v0.11.0-x86_64-unknown-linux-musl/just || true
+            echo "Installing just..."
+            curl -fsSL -o /tmp/just.tar.gz https://github.com/casey/just/releases/download/v0.11.0/just-v0.11.0-x86_64-unknown-linux-musl.tar.gz
+            sudo tar -xzf /tmp/just.tar.gz -C /tmp
+            sudo mv /tmp/just-v0.11.0-x86_64-unknown-linux-musl/just /usr/local/bin/just
+            sudo chmod +x /usr/local/bin/just
           fi
-          just --version || true
+          # Verify installation
+          if command -v just >/dev/null 2>&1; then
+            just --version
+          else
+            echo "just not installed";
+            exit 1;
+          fi
 
       - name: Run integration tests (under bash)
         env:
