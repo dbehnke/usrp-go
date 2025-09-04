@@ -1,185 +1,4 @@
----
-name: CI - Integration Tests
-
-on:
-  push:
-  pull_request:
-
-jobs:
-  integration:
-    name: Integration (Docker-in-Docker)
-    runs-on: ubuntu-latest
-    services:
-      docker:
-        image: docker:24-dind
-        privileged: true
-        options: >-
-          --privileged
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Configure Docker client
-        run: |
-          echo "DOCKER_HOST=tcp://localhost:2375" >> $GITHUB_ENV
-
-      - name: Install prerequisites
-        run: |
-          sudo apt-get update -y
-          sudo apt-get install -y curl ca-certificates git make build-essential
-          # Install just if not available (best-effort)
-          if ! command -v just >/dev/null 2>&1; then
-            curl -fsSL https://github.com/casey/just/releases/download/v0.11.0/just-v0.11.0-x86_64-unknown-linux-musl.tar.gz \
-              | sudo tar -xz -C /usr/local/bin --strip-components=1 just-v0.11.0-x86_64-unknown-linux-musl/just || true
-          fi
-          just --version || true
-
-      - name: Run integration tests (under bash)
-        env:
-          CI: "true"
-        run: |
-          # Run the project's integration test recipe inside bash so POSIX $?, pipes, and
-          # other expectations behave correctly.
-          env bash -lc 'set -o pipefail; just test-integration'
-        timeout-minutes: 60
-
-  dagger-placeholder:
-    name: Dagger (placeholder)
-    runs-on: ubuntu-latest
-    if: false
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Install Dagger CLI (optional)
-        run: |
-          curl -fsSL https://dl.dagger.io/cli.sh | sh
-
-      - name: TODO: run Dagger pipeline
-        run: |
-          echo "This job is a placeholder for a Dagger-based pipeline. Replace with dagger script."
----
-name: CI - Integration Tests
-
-on:
-  push:
-  pull_request:
-
-jobs:
-  integration:
-    name: Integration (Docker-in-Docker)
-    runs-on: ubuntu-latest
-    services:
-      docker:
-        image: docker:24-dind
-        privileged: true
-        options: >-
-          --privileged
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Configure Docker client
-        run: |
-          echo "DOCKER_HOST=tcp://localhost:2375" >> $GITHUB_ENV
-
-      - name: Install prerequisites
-        run: |
-          sudo apt-get update -y
-          sudo apt-get install -y curl ca-certificates git make build-essential
-          # Install just if not available (best-effort)
-          if ! command -v just >/dev/null 2>&1; then
-            curl -fsSL https://github.com/casey/just/releases/download/v0.11.0/just-v0.11.0-x86_64-unknown-linux-musl.tar.gz \
-              | sudo tar -xz -C /usr/local/bin --strip-components=1 just-v0.11.0-x86_64-unknown-linux-musl/just || true
-          fi
-          just --version || true
-
-      - name: Run integration tests (under bash)
-        env:
-          CI: "true"
-        run: |
-          # Run the project's integration test recipe inside bash so POSIX $?, pipes, and
-          # other expectations behave correctly.
-          env bash -lc 'set -o pipefail; just test-integration'
-        timeout-minutes: 60
-
-  dagger-placeholder:
-    name: Dagger (placeholder)
-    runs-on: ubuntu-latest
-    if: false
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Install Dagger CLI (optional)
-        run: |
-          curl -fsSL https://dl.dagger.io/cli.sh | sh
-
-      - name: TODO: run Dagger pipeline
-        run: |
-          echo "This job is a placeholder for a Dagger-based pipeline. Replace with dagger script."
----
-name: CI - Integration Tests
-
-on:
-  push:
-  pull_request:
-
-jobs:
-  integration:
-    name: Integration (Docker-in-Docker)
-    runs-on: ubuntu-latest
-    services:
-      docker:
-        image: docker:24-dind
-        privileged: true
-        options: >-
-          --privileged
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Configure Docker client
-        run: |
-          echo "DOCKER_HOST=tcp://localhost:2375" >> $GITHUB_ENV
-
-      - name: Install prerequisites
-        run: |
-          sudo apt-get update -y
-          sudo apt-get install -y curl ca-certificates git make build-essential
-          # Install just if not available (best-effort)
-          if ! command -v just >/dev/null 2>&1; then
-            curl -fsSL https://github.com/casey/just/releases/download/v0.11.0/just-v0.11.0-x86_64-unknown-linux-musl.tar.gz \
-              | sudo tar -xz -C /usr/local/bin --strip-components=1 just-v0.11.0-x86_64-unknown-linux-musl/just || true
-          fi
-          just --version || true
-
-      - name: Run integration tests (under bash)
-        env:
-          CI: "true"
-        run: |
-          # Run the project's integration test recipe inside bash so POSIX $?, pipes, and
-          # other expectations behave correctly.
-          env bash -lc 'set -o pipefail; just test-integration'
-        timeout-minutes: 60
-
-  dagger-placeholder:
-    name: Dagger (placeholder)
-    runs-on: ubuntu-latest
-    if: false
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Install Dagger CLI (optional)
-        run: |
-          curl -fsSL https://dl.dagger.io/cli.sh | sh
-
-      - name: TODO: run Dagger pipeline
-        run: |
-          echo "This job is a placeholder for a Dagger-based pipeline. Replace with dagger script."
----
-name: CI - Integration Tests
+name: CI - Integration & Dagger
 
 on:
   push:
@@ -194,7 +13,6 @@ jobs:
     services:
       docker:
         image: docker:24-dind
-        privileged: true
         options: >-
           --privileged
     steps:
@@ -225,19 +43,28 @@ jobs:
           env bash -lc 'set -o pipefail; just test-integration'
         timeout-minutes: 60
 
-  # Optional: future Dagger job
-  dagger-placeholder:
-    name: Dagger (placeholder)
+  dagger-run:
+    name: Dagger Go pipeline
     runs-on: ubuntu-latest
-    if: false
+    needs: integration
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install Dagger CLI (optional)
+      - name: Setup Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.20'
+
+      - name: Install Dagger CLI
         run: |
           curl -fsSL https://dl.dagger.io/cli.sh | sh
 
-      - name: TODO: run Dagger pipeline
+      - name: Build and run Dagger pipeline
+        env:
+          CI: "true"
         run: |
-          echo "This job is a placeholder for a Dagger-based pipeline. Replace with dagger script."
+          cd ci/dagger
+          go build -o run .
+          ./run
+        timeout-minutes: 30

@@ -4,6 +4,7 @@ import (
     "context"
     "fmt"
     "os"
+    "path/filepath"
 
     dagger "dagger.io/dagger"
 )
@@ -19,28 +20,56 @@ func main() {
     }
     defer c.Close()
 
-    // Mount repository into /src in the container
-    src := c.Host().Directory(".")
+    // Mount the repository root into the container. When running from ci/dagger the
+    // repository root is two levels up (../..). Compute an absolute path to be safe.
+    cwd, err := os.Getwd()
+    if err != nil {
+        fmt.Fprintf(os.Stderr, "failed to get cwd: %v\n", err)
+        os.Exit(4)
+    }
+    repoRoot := cwd + "/../.."
+    // Prefer an absolute path
+    repoRootAbs, err := filepath.Abs(repoRoot)
+    if err != nil {
+        fmt.Fprintf(os.Stderr, "failed to resolve repo root: %v\n", err)
+        os.Exit(5)
+    }
+    src := c.Host().Directory(repoRootAbs)
 
     // Use Ubuntu so /usr/bin/env bash exists for the validator script
     ctr := c.Container().From("ubuntu:24.04").WithDirectory("/work", src).WithWorkdir("/work")
 
-    // Run the validator script (ensure executable). Use /bin/sh -c to chain commands.
-    cmd := []string{"/bin/sh", "-c", "chmod +x test/containers/test-validator/run-integration-tests.sh && test/containers/test-validator/run-integration-tests.sh"}
-    res := ctr.WithExec(cmd)
+    // Diagnostic: list and print the validator script first to inspect its contents
+    probe := ctr.WithExec([]string{"/bin/sh", "-c", "echo '--- listing ---' && ls -la test/containers/test-validator && echo '--- cat ---' && sed -n '1,200p' test/containers/test-validator/run-integration-tests.sh || true"})
 
-    // Always try to print stdout/stderr for debugging
-    if out, err := res.Stdout(ctx); err == nil && out != "" {
+    if out, err := probe.Stdout(ctx); err == nil && out != "" {
         fmt.Print(out)
     }
-    if errOut, err := res.Stderr(ctx); err == nil && errOut != "" {
+    if errOut, err := probe.Stderr(ctx); err == nil && errOut != "" {
+        fmt.Fprint(os.Stderr, errOut)
+    }
+
+    // Run the validator script via sh to avoid depending on executable bit inside the
+    // Dagger container image.
+    cmd := []string{"/bin/sh", "-c", "sh test/containers/test-validator/run-integration-tests.sh"}
+    res := ctr.WithExec(cmd)
+
+    // Debug: try to fetch stdout/stderr and any exec error
+    out, outErr := res.Stdout(ctx)
+    if outErr == nil && out != "" {
+        fmt.Print(out)
+    }
+    errOut, errErr := res.Stderr(ctx)
+    if errErr == nil && errOut != "" {
         fmt.Fprint(os.Stderr, errOut)
     }
 
     exitCode, err := res.ExitCode(ctx)
     if err != nil {
-        // show the error and exit
+        // show the error and include stdout/stderr fetch errors
         fmt.Fprintf(os.Stderr, "failed to get exit code: %v\n", err)
+        if outErr != nil { fmt.Fprintf(os.Stderr, "stdout fetch error: %v\n", outErr) }
+        if errErr != nil { fmt.Fprintf(os.Stderr, "stderr fetch error: %v\n", errErr) }
         os.Exit(3)
     }
 
