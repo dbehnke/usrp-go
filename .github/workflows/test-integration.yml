@@ -10,6 +10,11 @@ jobs:
   dagger-run:
     name: Dagger Go pipeline
     runs-on: ubuntu-latest
+    services:
+      docker:
+        image: docker:24-dind
+        options: >-
+          --privileged
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -19,19 +24,12 @@ jobs:
         with:
           go-version: '1.25'
 
-      - name: Install Dagger CLI (installer)
-        run: |
-          set -eux
-          # Install dagger using their installer into $HOME/.local/bin
-          curl -fsSL https://dl.dagger.io/dagger/install.sh | BIN_DIR=$HOME/.local/bin sh
-          export PATH="$HOME/.local/bin:$PATH"
-          $HOME/.local/bin/dagger version
-
-      - name: Build and run Dagger pipeline
+      - name: Build and run Dagger pipeline (Go-based runner)
         env:
           CI: "true"
         run: |
+          # Ensure Docker client talks to the DinD service
+          echo "DOCKER_HOST=tcp://localhost:2375" >> $GITHUB_ENV
           cd ci/dagger
-          go build -o run .
-          ./run
+          go run main.go
         timeout-minutes: 30
