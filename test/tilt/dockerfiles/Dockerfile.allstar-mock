@@ -1,0 +1,49 @@
+# Dockerfile for AllStarLink Mock Server with live reload
+
+FROM golang:1.25-alpine AS builder
+
+# Install development tools
+RUN apk add --no-cache git ca-certificates tzdata netcat-openbsd
+
+WORKDIR /build
+
+# Copy source files
+COPY . .
+
+# Initialize go module if needed
+RUN if [ ! -f go.mod ]; then go mod init allstar-mock; fi
+RUN if [ ! -f go.sum ]; then go mod tidy; fi
+
+# Build the mock server
+RUN go build -o allstar-mock allstar-mock.go
+
+# Runtime image
+FROM alpine:latest
+
+RUN apk --no-cache add ca-certificates tzdata netcat-openbsd tcpdump sox
+
+WORKDIR /app
+
+# Copy binary
+COPY --from=builder /build/allstar-mock .
+
+# Copy audio patterns if they exist
+COPY --from=builder /build/audio-patterns/ ./patterns/ 2>/dev/null || mkdir -p ./patterns
+
+# Create non-root user
+RUN addgroup -g 1001 -S appuser && \
+    adduser -u 1001 -S appuser -G appuser
+
+# Create required directories
+RUN mkdir -p /app/logs /app/audio-samples && \
+    chown -R appuser:appuser /app
+
+USER appuser
+
+EXPOSE 34001/udp 34002/udp
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+  CMD nc -z localhost ${LISTEN_PORT:-34001} || exit 1
+
+ENTRYPOINT ["./allstar-mock"]

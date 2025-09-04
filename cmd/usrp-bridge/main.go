@@ -199,7 +199,11 @@ func main() {
 	if err := bridge.Start(); err != nil {
 		log.Fatalf("Failed to start bridge: %v", err)
 	}
-	defer bridge.Stop()
+	defer func() {
+		if err := bridge.Stop(); err != nil {
+			log.Printf("Error stopping bridge: %v", err)
+		}
+	}()
 
 	// Setup signal handling
 	sigChan := make(chan os.Signal, 1)
@@ -347,7 +351,10 @@ func (b *Bridge) processUSRPPackets() {
 			return
 		default:
 			// Set read timeout
-			b.usrpConn.SetReadDeadline(time.Now().Add(100 * time.Millisecond))
+			if err := b.usrpConn.SetReadDeadline(time.Now().Add(100 * time.Millisecond)); err != nil {
+				log.Printf("Failed to set USRP read deadline: %v", err)
+				continue
+			}
 
 			n, addr, err := b.usrpConn.ReadFromUDP(buffer)
 			if err != nil {
@@ -385,6 +392,7 @@ func (b *Bridge) processVoicePacket(voiceMsg *usrp.VoiceMessage, sourceAddr *net
 	if b.config.StationCall != "N0CALL" && b.config.StationCall != "" {
 		// Note: In a full implementation, you might want to add TLV metadata
 		// with the station callsign for amateur radio compliance
+		log.Printf("Processing voice packet from station: %s", b.config.StationCall)
 	}
 
 	// Forward to destination services if audio conversion is enabled

@@ -117,22 +117,32 @@ func (b *Bot) onMessageCreate(s *discordgo.Session, m *discordgo.MessageCreate) 
 	switch m.Content {
 	case "!join":
 		if err := b.JoinVoiceChannel(m.GuildID, m.ChannelID); err != nil {
-			s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("Error joining voice: %v", err))
+			if _, msgErr := s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("Error joining voice: %v", err)); msgErr != nil {
+				log.Printf("Failed to send error message: %v", msgErr)
+			}
 		} else {
-			s.ChannelMessageSend(m.ChannelID, "Joined voice channel! 📻")
+			if _, msgErr := s.ChannelMessageSend(m.ChannelID, "Joined voice channel! 📻"); msgErr != nil {
+				log.Printf("Failed to send success message: %v", msgErr)
+			}
 		}
 	case "!leave":
 		if err := b.LeaveVoiceChannel(); err != nil {
-			s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("Error leaving voice: %v", err))
+			if _, msgErr := s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("Error leaving voice: %v", err)); msgErr != nil {
+				log.Printf("Failed to send error message: %v", msgErr)
+			}
 		} else {
-			s.ChannelMessageSend(m.ChannelID, "Left voice channel! 👋")
+			if _, msgErr := s.ChannelMessageSend(m.ChannelID, "Left voice channel! 👋"); msgErr != nil {
+				log.Printf("Failed to send success message: %v", msgErr)
+			}
 		}
 	case "!status":
 		status := "Disconnected"
 		if b.IsConnected() {
-			status = fmt.Sprintf("Connected to voice channel")
+			status = "Connected to voice channel"
 		}
-		s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("Status: %s", status))
+		if _, msgErr := s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("Status: %s", status)); msgErr != nil {
+			log.Printf("Failed to send status message: %v", msgErr)
+		}
 	}
 }
 
@@ -173,7 +183,9 @@ func (b *Bot) Stop() error {
 	
 	// Leave voice channel if connected
 	if b.voiceConn != nil {
-		b.voiceConn.Disconnect()
+		if err := b.voiceConn.Disconnect(); err != nil {
+			log.Printf("Error disconnecting from voice: %v", err)
+		}
 		b.voiceConn = nil
 	}
 	
@@ -193,7 +205,9 @@ func (b *Bot) JoinVoiceChannel(guildID, channelID string) error {
 	
 	// Leave current channel if connected
 	if b.voiceConn != nil {
-		b.voiceConn.Disconnect()
+		if err := b.voiceConn.Disconnect(); err != nil {
+			log.Printf("Error disconnecting from previous voice channel: %v", err)
+		}
 		b.voiceConn = nil
 	}
 	

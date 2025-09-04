@@ -1,0 +1,168 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: allstar-mock-1
+  labels:
+    app: allstar-mock-1
+    component: mock-service
+    service-type: usrp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: allstar-mock-1
+  template:
+    metadata:
+      labels:
+        app: allstar-mock-1
+        component: mock-service
+        service-type: usrp
+    spec:
+      containers:
+      - name: allstar-mock
+        image: allstar-mock
+        ports:
+        - containerPort: 34001
+          protocol: UDP
+        env:
+        - name: NODE_ID
+          value: "12345"
+        - name: CALLSIGN
+          value: "W1DEV"
+        - name: TALK_GROUP
+          value: "1"
+        - name: TEST_PATTERN
+          value: "sine_440hz"
+        - name: LISTEN_PORT
+          value: "34001"
+        - name: REMOTE_ADDR
+          value: "audio-router-service"
+        - name: REMOTE_PORT
+          value: "32001"
+        command: ["./allstar-mock"]
+        args: [
+          "-node", "12345",
+          "-callsign", "W1DEV", 
+          "-listen-port", "34001",
+          "-remote-addr", "audio-router-service",
+          "-remote-port", "32001",
+          "-pattern", "sine_440hz"
+        ]
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "50m"
+          limits:
+            memory: "128Mi"
+            cpu: "200m"
+        livenessProbe:
+          exec:
+            command:
+            - nc
+            - -z
+            - localhost
+            - "34001"
+          initialDelaySeconds: 10
+          periodSeconds: 30
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: allstar-mock-1-service
+  labels:
+    app: allstar-mock-1
+spec:
+  type: ClusterIP
+  ports:
+  - name: usrp
+    port: 34001
+    targetPort: 34001
+    protocol: UDP
+  selector:
+    app: allstar-mock-1
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: allstar-mock-2
+  labels:
+    app: allstar-mock-2
+    component: mock-service
+    service-type: usrp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: allstar-mock-2
+  template:
+    metadata:
+      labels:
+        app: allstar-mock-2
+        component: mock-service
+        service-type: usrp
+    spec:
+      containers:
+      - name: allstar-mock
+        image: allstar-mock
+        ports:
+        - containerPort: 34002
+          protocol: UDP
+        env:
+        - name: NODE_ID
+          value: "54321"
+        - name: CALLSIGN
+          value: "W2DEV"
+        - name: TALK_GROUP
+          value: "2"
+        - name: TEST_PATTERN
+          value: "sine_1khz"
+        - name: LISTEN_PORT
+          value: "34002"
+        - name: REMOTE_ADDR
+          value: "audio-router-service"
+        - name: REMOTE_PORT
+          value: "32002"
+        command: ["./allstar-mock"]
+        args: [
+          "-node", "54321",
+          "-callsign", "W2DEV",
+          "-listen-port", "34002", 
+          "-remote-addr", "audio-router-service",
+          "-remote-port", "32002",
+          "-pattern", "sine_1khz"
+        ]
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "50m"
+          limits:
+            memory: "128Mi"
+            cpu: "200m"
+        livenessProbe:
+          exec:
+            command:
+            - nc
+            - -z
+            - localhost
+            - "34002"
+          initialDelaySeconds: 10
+          periodSeconds: 30
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: allstar-mock-2-service
+  labels:
+    app: allstar-mock-2
+spec:
+  type: ClusterIP
+  ports:
+  - name: usrp
+    port: 34002
+    targetPort: 34002
+    protocol: UDP
+  selector:
+    app: allstar-mock-2

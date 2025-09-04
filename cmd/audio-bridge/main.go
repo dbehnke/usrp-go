@@ -148,7 +148,11 @@ func testStreamingBridge() error {
 	}
 
 	bridge := audio.NewAudioBridge(converter)
-	defer bridge.Stop()
+	defer func() {
+		if err := bridge.Stop(); err != nil {
+			log.Printf("Error stopping bridge: %v", err)
+		}
+	}()
 
 	if err := bridge.Start(); err != nil {
 		return fmt.Errorf("failed to start bridge: %w", err)
@@ -244,7 +248,10 @@ func runServer() {
 			return
 		default:
 			// Set read timeout
-			usrpConn.SetReadDeadline(time.Now().Add(100 * time.Millisecond))
+			if err := usrpConn.SetReadDeadline(time.Now().Add(100 * time.Millisecond)); err != nil {
+				log.Printf("Failed to set USRP read deadline: %v", err)
+				continue
+			}
 
 			n, _, err := usrpConn.ReadFromUDP(buffer)
 			if err != nil {
@@ -346,7 +353,10 @@ func runClient() {
 			return
 		default:
 			// Set read timeout
-			opusConn.SetReadDeadline(time.Now().Add(100 * time.Millisecond))
+			if err := opusConn.SetReadDeadline(time.Now().Add(100 * time.Millisecond)); err != nil {
+				log.Printf("Failed to set Opus read deadline: %v", err)
+				continue
+			}
 
 			n, _, err := opusConn.ReadFromUDP(buffer)
 			if err != nil {

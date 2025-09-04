@@ -1,0 +1,150 @@
+version: '3.8'
+
+services:
+  # Audio Router Hub - The system under test
+  audio-router:
+    build: 
+      context: ../../
+      dockerfile: test/containers/audio-router/Dockerfile
+    ports:
+      - "9090:9090"  # Status HTTP server
+      - "32001:32001/udp"  # USRP service 1
+      - "32002:32002/udp"  # USRP service 2  
+      - "32003:32003/udp"  # WhoTalkie service 1
+      - "32004:32004/udp"  # WhoTalkie service 2
+    volumes:
+      - ./configs/audio-router-test.json:/app/config.json
+    command: ["/app/audio-router", "-config", "/app/config.json", "-verbose"]
+    depends_on:
+      - allstar-mock-1
+      - allstar-mock-2
+      - whotalkie-mock-1
+      - whotalkie-mock-2
+      - discord-mock
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9090/status"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  # Mock AllStarLink Servers
+  allstar-mock-1:
+    build: ./containers/allstar-mock
+    ports:
+      - "34001:34001/udp"
+    environment:
+      - NODE_ID=12345
+      - CALLSIGN=W1AW
+      - TALK_GROUP=1
+      - TEST_PATTERN=sine_440hz
+    command: ["./allstar-mock", "-node", "12345", "-callsign", "W1AW"]
+
+  allstar-mock-2:
+    build: ./containers/allstar-mock  
+    ports:
+      - "34002:34002/udp"
+    environment:
+      - NODE_ID=54321
+      - CALLSIGN=W2XYZ
+      - TALK_GROUP=2
+      - TEST_PATTERN=sine_1khz
+    command: ["./allstar-mock", "-node", "54321", "-callsign", "W2XYZ"]
+
+  # Mock WhoTalkie Services
+  whotalkie-mock-1:
+    build: ./containers/whotalkie-mock
+    ports:
+      - "8080:8080/udp"
+    environment:
+      - SERVICE_NAME=whotalkie-primary
+      - AUDIO_FORMAT=opus
+      - BITRATE=64000
+    volumes:
+      - ./audio-samples:/app/samples
+      - ./test-results:/app/results
+
+  whotalkie-mock-2:
+    build: ./containers/whotalkie-mock
+    ports:
+      - "8081:8081/udp" 
+    environment:
+      - SERVICE_NAME=whotalkie-backup
+      - AUDIO_FORMAT=opus
+      - BITRATE=32000
+    volumes:
+      - ./audio-samples:/app/samples
+      - ./test-results:/app/results
+
+  # Mock Discord Voice Gateway
+  discord-mock:
+    build: ./containers/discord-mock
+    ports:
+      - "8082:8082/tcp"
+    environment:
+      - GUILD_ID=123456789
+      - CHANNEL_ID=987654321
+      - BOT_USER_ID=555666777
+    volumes:
+      - ./test-results:/app/results
+
+  # Generic UDP/TCP Service Mock
+  generic-mock:
+    build: ./containers/generic-mock
+    ports:
+      - "9000:9000/udp"
+      - "9001:9001/tcp"
+    environment:
+      - PROTOCOL=both
+      - AUDIO_FORMAT=pcm
+
+  # Audio Test Signal Generator
+  audio-generator:
+    build: ./containers/audio-generator
+    volumes:
+      - ./audio-samples:/output
+      - ./test-patterns:/patterns
+    command: ["./generate-test-audio.sh", "/output"]
+
+  # Test Validation Engine
+  test-validator:
+    build: ./containers/test-validator
+    depends_on:
+      - audio-router
+      - allstar-mock-1
+      - allstar-mock-2
+      - whotalkie-mock-1
+      - whotalkie-mock-2
+      - discord-mock
+    volumes:
+      - ./test-results:/results
+      - ./test-configs:/configs
+    command: ["./run-integration-tests.sh"]
+
+  # Monitoring and Metrics
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9091:9090"
+    volumes:
+      - ./configs/prometheus.yml:/etc/prometheus/prometheus.yml
+    command: ["--config.file=/etc/prometheus/prometheus.yml", "--storage.tsdb.path=/prometheus"]
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - ./configs/grafana:/etc/grafana/provisioning
+
+volumes:
+  prometheus-data:
+  grafana-data:
+
+networks:
+  default:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16

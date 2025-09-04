@@ -1,0 +1,54 @@
+# Multi-stage Dockerfile for Audio Router Hub with live reload support
+
+FROM golang:1.25-alpine AS base
+RUN apk add --no-cache git ca-certificates tzdata
+WORKDIR /app
+
+# Copy go mod files
+COPY go.mod go.sum ./
+RUN go mod download
+
+# Development stage - optimized for live reloading
+FROM base AS dev
+RUN apk add --no-cache curl netcat-openbsd tcpdump
+COPY . .
+RUN go build -o audio-router ./cmd/audio-router/main.go
+
+# Create non-root user
+RUN addgroup -g 1001 -S appuser && \
+    adduser -u 1001 -S appuser -G appuser
+
+# Set up directories
+RUN mkdir -p /app/config /app/audio-samples /app/test-results && \
+    chown -R appuser:appuser /app
+
+USER appuser
+
+EXPOSE 9090 32001/udp 32002/udp 32003/udp 32004/udp 32005/tcp
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+  CMD curl -f http://localhost:9090/status || exit 1
+
+CMD ["./audio-router", "-config", "/app/config/audio-router-dev.json", "-verbose"]
+
+# Production stage - optimized build
+FROM base AS prod
+COPY . .
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o audio-router ./cmd/audio-router/main.go
+
+FROM alpine:latest AS production
+RUN apk --no-cache add ca-certificates tzdata curl
+WORKDIR /app
+COPY --from=prod /app/audio-router .
+
+RUN addgroup -g 1001 -S appuser && \
+    adduser -u 1001 -S appuser -G appuser
+USER appuser
+
+EXPOSE 9090 32001/udp 32002/udp 32003/udp 32004/udp 32005/tcp
+
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+  CMD curl -f http://localhost:9090/status || exit 1
+
+CMD ["./audio-router"]

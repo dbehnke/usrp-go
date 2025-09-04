@@ -88,7 +88,11 @@ func runDiscordTest() {
 	if err := bot.Start(ctx); err != nil {
 		log.Fatalf("Failed to start bot: %v", err)
 	}
-	defer bot.Stop()
+	defer func() {
+		if err := bot.Stop(); err != nil {
+			log.Printf("Error stopping bot: %v", err)
+		}
+	}()
 
 	fmt.Println("✅ Bot connected successfully!")
 
@@ -100,8 +104,11 @@ func runDiscordTest() {
 		} else {
 			fmt.Println("✅ Successfully joined voice channel!")
 			time.Sleep(3 * time.Second)
-			bot.LeaveVoiceChannel()
-			fmt.Println("👋 Left voice channel")
+			if err := bot.LeaveVoiceChannel(); err != nil {
+				log.Printf("Error leaving voice channel: %v", err)
+			} else {
+				fmt.Println("👋 Left voice channel")
+			}
 		}
 	}
 
@@ -144,7 +151,11 @@ func runDiscordBridge() {
 	if err := bridge.Start(); err != nil {
 		log.Fatalf("Failed to start bridge: %v", err)
 	}
-	defer bridge.Stop()
+	defer func() {
+		if err := bridge.Stop(); err != nil {
+			log.Printf("Error stopping bridge: %v", err)
+		}
+	}()
 
 	// Setup signal handling
 	sigChan := make(chan os.Signal, 1)
@@ -173,7 +184,10 @@ func runDiscordBridge() {
 
 		for {
 			// Set read timeout
-			usrpConn.SetReadDeadline(time.Now().Add(100 * time.Millisecond))
+			if err := usrpConn.SetReadDeadline(time.Now().Add(100 * time.Millisecond)); err != nil {
+				log.Printf("Failed to set USRP read deadline: %v", err)
+				continue
+			}
 
 			n, _, err := usrpConn.ReadFromUDP(buffer)
 			if err != nil {
@@ -211,16 +225,13 @@ func runDiscordBridge() {
 	defer statusTicker.Stop()
 
 	go func() {
-		for {
-			select {
-			case <-statusTicker.C:
-				if bridge.IsRunning() {
-					status := "Disconnected"
-					if bridge.IsDiscordConnected() {
-						status = "Connected"
-					}
-					fmt.Printf("🔄 Bridge Status: Running, Discord: %s\n", status)
+		for range statusTicker.C {
+			if bridge.IsRunning() {
+				status := "Disconnected"
+				if bridge.IsDiscordConnected() {
+					status = "Connected"
 				}
+				fmt.Printf("🔄 Bridge Status: Running, Discord: %s\n", status)
 			}
 		}
 	}()

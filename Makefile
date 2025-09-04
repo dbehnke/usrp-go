@@ -95,6 +95,64 @@ build-audio-router:
 	@mkdir -p bin
 	@go build -o bin/audio-router cmd/audio-router/main.go
 
+# Integration Testing targets
+test-integration-build:
+	@echo "Building Docker containers for integration testing..."
+	@docker-compose -f test/integration/docker-compose.yml build
+
+test-integration-up:
+	@echo "Starting integration test environment..."
+	@docker-compose -f test/integration/docker-compose.yml up -d
+	@sleep 10  # Wait for services to start
+
+test-integration-down:
+	@echo "Stopping integration test environment..."
+	@docker-compose -f test/integration/docker-compose.yml down
+
+test-integration-run:
+	@echo "Running comprehensive integration tests..."
+	@docker-compose -f test/integration/docker-compose.yml exec test-validator /app/run-integration-tests.sh
+
+test-integration: test-integration-build test-integration-up
+	@echo "Running complete integration test suite..."
+	@sleep 15  # Wait for all services to be ready
+	@docker-compose -f test/integration/docker-compose.yml exec test-validator /app/run-integration-tests.sh || true
+	@make test-integration-down
+
+test-integration-logs:
+	@echo "Showing integration test logs..."
+	@docker-compose -f test/integration/docker-compose.yml logs
+
+test-integration-clean:
+	@echo "Cleaning up integration test environment..."
+	@docker-compose -f test/integration/docker-compose.yml down -v
+	@docker system prune -f
+
+# Tilt Development Environment targets  
+tilt-up:
+	@echo "Starting Tilt development environment..."
+	@tilt up
+
+tilt-down:
+	@echo "Stopping Tilt development environment..."
+	@tilt down
+
+tilt-logs:
+	@echo "Showing Tilt service logs..."
+	@tilt logs
+
+tilt-test:
+	@echo "Running Tilt integration tests..."
+	@tilt trigger integration-tests
+
+tilt-status:
+	@echo "Checking Tilt service status..."
+	@curl -f http://localhost:9090/status || echo "Audio Router not available"
+
+tilt-dashboard:
+	@echo "Opening Tilt dashboard..."
+	@open http://localhost:10350 || xdg-open http://localhost:10350 || echo "Please open http://localhost:10350"
+
 # Format code
 fmt:
 	@echo "Formatting code..."
@@ -167,3 +225,19 @@ help:
 	@echo "  run-audio-router-config - Generate sample configuration"
 	@echo "  run-audio-router-with-config - Run with audio-router.json config"
 	@echo "  build-audio-router      - Build Audio Router Hub binary"
+	@echo ""
+	@echo "Integration Testing:"
+	@echo "  test-integration        - Run complete Docker-based integration tests"
+	@echo "  test-integration-build  - Build integration test containers"
+	@echo "  test-integration-up     - Start integration test environment"
+	@echo "  test-integration-down   - Stop integration test environment"
+	@echo "  test-integration-logs   - Show integration test logs"
+	@echo "  test-integration-clean  - Clean up integration test environment"
+	@echo ""
+	@echo "Tilt Development Environment:"
+	@echo "  tilt-up                 - Start Tilt development environment"
+	@echo "  tilt-down               - Stop Tilt development environment"
+	@echo "  tilt-logs               - Show Tilt service logs"
+	@echo "  tilt-test               - Run integration tests in Tilt"
+	@echo "  tilt-status             - Check Audio Router status"
+	@echo "  tilt-dashboard          - Open Tilt dashboard"

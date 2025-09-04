@@ -1,0 +1,232 @@
+{
+  "router": {
+    "name": "Integration Test Audio Router Hub",
+    "description": "Docker-based integration testing environment",
+    "listen_addr": "0.0.0.0",
+    "status_port": 9090
+  },
+  "audio": {
+    "buffer_size": 1000,
+    "processing_delay": 10,
+    "max_concurrent_tx": 5,
+    "tx_timeout_seconds": 30,
+    "enable_conversion": true,
+    "default_format": "opus"
+  },
+  "routing": {
+    "prevent_loops": true,
+    "enable_priority_rules": true,
+    "default_routing": "all-to-all",
+    "blocked_pairs": []
+  },
+  "amateur": {
+    "station_call": "W1TEST",
+    "default_talk_group": 1,
+    "require_valid_call": false,
+    "log_transmissions": true
+  },
+  "services": [
+    {
+      "id": "allstar_mock_1",
+      "type": "usrp",
+      "name": "AllStarLink Mock Node 12345",
+      "description": "Primary test AllStarLink node with 440Hz sine wave",
+      "enabled": true,
+      "network": {
+        "protocol": "udp",
+        "listen_addr": "0.0.0.0",
+        "listen_port": 32001,
+        "remote_addr": "allstar-mock-1",
+        "remote_port": 34001
+      },
+      "audio": {
+        "format": "pcm",
+        "sample_rate": 8000,
+        "channels": 1,
+        "bitrate": 64000
+      },
+      "routing": {
+        "can_send": true,
+        "can_receive": true,
+        "send_to_types": ["whotalkie", "discord", "generic"],
+        "receive_from": ["whotalkie", "discord", "generic"],
+        "exclude_services": [],
+        "priority": 5
+      }
+    },
+    {
+      "id": "allstar_mock_2", 
+      "type": "usrp",
+      "name": "AllStarLink Mock Node 54321",
+      "description": "Secondary test AllStarLink node with 1kHz sine wave",
+      "enabled": true,
+      "network": {
+        "protocol": "udp",
+        "listen_addr": "0.0.0.0",
+        "listen_port": 32002,
+        "remote_addr": "allstar-mock-2",
+        "remote_port": 34002
+      },
+      "audio": {
+        "format": "pcm",
+        "sample_rate": 8000,
+        "channels": 1,
+        "bitrate": 64000
+      },
+      "routing": {
+        "can_send": true,
+        "can_receive": true,
+        "send_to_types": ["whotalkie", "usrp"],
+        "receive_from": ["whotalkie", "usrp"],
+        "exclude_services": ["allstar_mock_1"],
+        "priority": 4
+      }
+    },
+    {
+      "id": "whotalkie_primary",
+      "type": "whotalkie", 
+      "name": "WhoTalkie Primary Test Service",
+      "description": "Primary WhoTalkie service for integration testing",
+      "enabled": true,
+      "network": {
+        "protocol": "udp",
+        "listen_addr": "0.0.0.0",
+        "listen_port": 32003,
+        "remote_addr": "whotalkie-mock-1",
+        "remote_port": 8080
+      },
+      "audio": {
+        "format": "opus",
+        "sample_rate": 48000,
+        "channels": 1,
+        "bitrate": 64000
+      },
+      "routing": {
+        "can_send": true,
+        "can_receive": true,
+        "send_to_types": ["usrp", "discord"],
+        "receive_from": ["usrp", "discord"], 
+        "exclude_services": [],
+        "priority": 3
+      }
+    },
+    {
+      "id": "whotalkie_backup",
+      "type": "whotalkie",
+      "name": "WhoTalkie Backup Test Service", 
+      "description": "Backup WhoTalkie service for failover testing",
+      "enabled": true,
+      "network": {
+        "protocol": "udp",
+        "listen_addr": "0.0.0.0",
+        "listen_port": 32004,
+        "remote_addr": "whotalkie-mock-2",
+        "remote_port": 8081
+      },
+      "audio": {
+        "format": "opus",
+        "sample_rate": 48000,
+        "channels": 1,
+        "bitrate": 32000
+      },
+      "routing": {
+        "can_send": true,
+        "can_receive": true,
+        "send_to_types": ["usrp"],
+        "receive_from": ["usrp"],
+        "exclude_services": [],
+        "priority": 2
+      }
+    },
+    {
+      "id": "discord_test",
+      "type": "discord",
+      "name": "Discord Test Bot",
+      "description": "Discord voice gateway simulator for testing",
+      "enabled": true,
+      "network": {
+        "protocol": "tcp",
+        "listen_addr": "0.0.0.0", 
+        "listen_port": 32005,
+        "remote_addr": "discord-mock",
+        "remote_port": 8082
+      },
+      "audio": {
+        "format": "pcm",
+        "sample_rate": 48000,
+        "channels": 2,
+        "bitrate": 128000
+      },
+      "settings": {
+        "bot_token": "TEST_BOT_TOKEN_12345",
+        "guild_id": "123456789012345678",
+        "channel_id": "987654321098765432",
+        "callsign": "W1TEST"
+      },
+      "routing": {
+        "can_send": true,
+        "can_receive": true,
+        "send_to_types": ["usrp", "whotalkie"],
+        "receive_from": ["usrp", "whotalkie"],
+        "exclude_services": [],
+        "priority": 3
+      }
+    },
+    {
+      "id": "generic_udp_test",
+      "type": "generic",
+      "name": "Generic UDP Test Service",
+      "description": "Generic UDP service for custom protocol testing",
+      "enabled": true,
+      "network": {
+        "protocol": "udp",
+        "listen_addr": "0.0.0.0",
+        "listen_port": 32006,
+        "remote_addr": "generic-mock",
+        "remote_port": 9000
+      },
+      "audio": {
+        "format": "pcm",
+        "sample_rate": 8000,
+        "channels": 1,
+        "bitrate": 64000
+      },
+      "routing": {
+        "can_send": true,
+        "can_receive": true,
+        "send_to_types": ["usrp"],
+        "receive_from": ["usrp"],
+        "exclude_services": [],
+        "priority": 1
+      }
+    },
+    {
+      "id": "generic_tcp_test",
+      "type": "generic",
+      "name": "Generic TCP Test Service",
+      "description": "Generic TCP service for stream protocol testing",
+      "enabled": false,
+      "network": {
+        "protocol": "tcp",
+        "listen_addr": "0.0.0.0",
+        "listen_port": 32007,
+        "remote_addr": "generic-mock",
+        "remote_port": 9001
+      },
+      "audio": {
+        "format": "pcm",
+        "sample_rate": 16000,
+        "channels": 1,
+        "bitrate": 128000
+      },
+      "routing": {
+        "can_send": false,
+        "can_receive": true,
+        "send_to_types": [],
+        "receive_from": ["usrp"],
+        "exclude_services": [],
+        "priority": 1
+      }
+    }
+  ]
+}

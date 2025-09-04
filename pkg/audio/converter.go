@@ -3,10 +3,10 @@
 package audio
 
 import (
-	"bytes"
 	"encoding/binary"
 	"fmt"
 	"io"
+	"log"
 	"os/exec"
 	"sync"
 	"time"
@@ -45,7 +45,6 @@ type StreamingConverter struct {
 	
 	// Buffers for handling streaming data
 	pcmBuffer      []int16       // Accumulate PCM samples
-	formatBuffer   bytes.Buffer  // Accumulate format data
 	
 	mutex          sync.Mutex    // Thread safety
 	closed         bool
@@ -298,12 +297,20 @@ func (sc *StreamingConverter) Close() error {
 	
 	// Stop processes
 	if sc.toFormatCmd != nil {
-		sc.toFormatCmd.Process.Kill()
-		sc.toFormatCmd.Wait()
+		if err := sc.toFormatCmd.Process.Kill(); err != nil {
+			log.Printf("Error killing toFormat process: %v", err)
+		}
+		if err := sc.toFormatCmd.Wait(); err != nil {
+			log.Printf("Error waiting for toFormat process: %v", err)
+		}
 	}
 	if sc.fromFormatCmd != nil {
-		sc.fromFormatCmd.Process.Kill()
-		sc.fromFormatCmd.Wait()
+		if err := sc.fromFormatCmd.Process.Kill(); err != nil {
+			log.Printf("Error killing fromFormat process: %v", err)
+		}
+		if err := sc.fromFormatCmd.Wait(); err != nil {
+			log.Printf("Error waiting for fromFormat process: %v", err)
+		}
 	}
 	
 	return nil

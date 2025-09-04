@@ -18,6 +18,14 @@ A Go library implementing the official USRP (Universal Software Radio Protocol) 
 
 ## Quick Start
 
+### **System Requirements**
+- **macOS**: [Colima](https://github.com/abiosoft/colima) + Docker + Kubernetes (recommended)
+- **Linux**: Docker + kind/minikube + Kubernetes
+- **Windows**: WSL2 + Docker + Kubernetes
+
+**See [REQUIREMENTS.md](docs/REQUIREMENTS.md) for detailed setup instructions.**
+
+### **Installation**
 ```bash
 go get github.com/dbehnke/usrp-go
 ```
@@ -96,13 +104,13 @@ Connect AllStarLink nodes to internet services (WhoTalkie, Discord, etc.):
 
 ```bash
 # Generate sample configuration
-make run-usrp-bridge-config
+just usrp-bridge-config
 
 # Edit usrp-bridge.json with your settings
 # Set your callsign, destinations, etc.
 
 # Run the bridge
-make run-usrp-bridge
+just usrp-bridge
 ```
 
 **Architecture**: `AllStarLink Node <--USRP--> Bridge <--Opus--> Internet Services`
@@ -119,10 +127,10 @@ export DISCORD_TOKEN="your_bot_token"
 export AMATEUR_CALLSIGN="N0CALL"
 
 # Test Discord connection
-make run-discord-test
+just discord-test
 
 # Run the bridge
-make run-discord-bridge
+just discord-bridge
 ```
 
 See [`docs/DISCORD_BRIDGE.md`](docs/DISCORD_BRIDGE.md) for complete setup guide.
@@ -133,13 +141,13 @@ Hub-and-spoke audio routing for connecting multiple amateur radio services:
 
 ```bash
 # Generate sample configuration
-make run-audio-router-config
+just router-config
 
 # Edit audio-router.json with your settings
 # Configure AllStarLink nodes, WhoTalkie, Discord, etc.
 
 # Run the router
-make run-audio-router-with-config
+just router-with-config
 ```
 
 **Architecture**: Scalable N-to-N audio routing with service prioritization:
@@ -163,6 +171,27 @@ Features:
 - **Amateur radio integration**: PTT control, callsign metadata, talk groups
 
 See [`docs/AUDIO_ROUTER.md`](docs/AUDIO_ROUTER.md) for complete setup guide.
+
+### **🚀 Development Environment**
+
+**Quick start with Tilt (live reload development):**
+```bash
+# macOS with Colima (recommended)
+brew install colima docker kubectl tilt just
+colima start --cpu 4 --memory 8 --kubernetes
+
+# Start live development environment
+just dev             # Starts Tilt with live reload
+just tilt-dashboard  # Opens http://localhost:10350
+```
+
+**Features:**
+- **⚡ Live Reload**: Code changes trigger automatic rebuilds (2-3 seconds)
+- **📊 Visual Dashboard**: Beautiful UI with real-time service status and logs  
+- **🧪 Integrated Testing**: Run comprehensive integration tests with one command
+- **🎵 Amateur Radio Testing**: Realistic AllStarLink, WhoTalkie, Discord simulation
+
+See [`test/tilt/README.md`](test/tilt/README.md) for complete development environment guide.
 
 ## Protocol Specification
 
@@ -200,19 +229,19 @@ Offset | Size | Field     | Description
 
 ```bash
 # Run protocol tests
-go run cmd/examples/main.go
+just run-example
 
 # Show all packet formats  
-go run cmd/examples/main.go formats
+just run-example formats
 
 # Run unit tests
-go test ./pkg/usrp/ -v
+just test
 
 # Run benchmarks
-go test -bench=. ./pkg/usrp/
+just bench
 
 # Test audio conversion (requires FFmpeg)
-go run cmd/examples/audio_bridge.go test
+just audio-test
 ```
 
 ### Example Output
@@ -309,13 +338,21 @@ usrp-go/
 │   └── main.go           # Discord bridge examples
 ├── cmd/audio-router/      # Audio Router Hub
 │   └── main.go           # Hub-and-spoke audio routing service
-├── docs/                  # Documentation
-│   ├── AUDIO_CONVERSION.md # Audio conversion guide
-│   ├── USRP_BRIDGE.md     # USRP bridge utility guide
-│   ├── DISCORD_BRIDGE.md  # Discord integration guide
-│   └── AUDIO_ROUTER.md    # Audio Router Hub setup guide
-└── internal/transport/    # UDP transport layer (WIP)
-    └── udp.go            # Network handling
+├── docs/                  # Complete documentation suite
+│   ├── REQUIREMENTS.md         # System requirements & setup (macOS/Linux/Windows)
+│   ├── AUDIO_CONVERSION.md     # Audio conversion guide
+│   ├── USRP_BRIDGE.md         # USRP bridge utility guide
+│   ├── DISCORD_BRIDGE.md      # Discord integration guide
+│   └── AUDIO_ROUTER.md        # Audio Router Hub setup guide
+├── test/                      # Comprehensive testing framework
+│   ├── tilt/                  # Tilt development environment
+│   │   ├── README.md          # Development environment guide
+│   │   ├── Tiltfile           # Live reload orchestration
+│   │   ├── k8s/               # Kubernetes manifests
+│   │   └── scripts/           # Integration testing scripts
+│   └── integration/           # Docker-based testing
+└── internal/transport/        # UDP transport layer (WIP)
+    └── udp.go                # Network handling
 ```
 
 ## Contributing

@@ -101,7 +101,11 @@ func TestAudioBridge(t *testing.T) {
 	}
 
 	bridge := NewAudioBridge(converter)
-	defer bridge.Stop()
+	defer func() {
+		if err := bridge.Stop(); err != nil {
+			t.Logf("Error stopping bridge: %v", err)
+		}
+	}()
 
 	// Start the bridge
 	if err := bridge.Start(); err != nil {

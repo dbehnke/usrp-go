@@ -238,7 +238,11 @@ func main() {
 	if err := router.Start(); err != nil {
 		log.Fatalf("Failed to start audio router: %v", err)
 	}
-	defer router.Stop()
+	defer func() {
+		if err := router.Stop(); err != nil {
+			log.Printf("Error stopping router: %v", err)
+		}
+	}()
 
 	// Setup signal handling
 	sigChan := make(chan os.Signal, 1)
@@ -673,7 +677,10 @@ func (r *AudioRouter) usrpServiceWorker(conn *ServiceConnection) {
 			if listener != nil {
 				// Read USRP packets
 				buffer := make([]byte, 1024)
-				listener.SetReadDeadline(time.Now().Add(1 * time.Second))
+				if err := listener.SetReadDeadline(time.Now().Add(1 * time.Second)); err != nil {
+					log.Printf("Failed to set read deadline: %v", err)
+					continue
+				}
 				n, remoteAddr, err := listener.ReadFrom(buffer)
 				if err != nil {
 					if netErr, ok := err.(net.Error); !ok || !netErr.Timeout() {
@@ -724,7 +731,10 @@ func (r *AudioRouter) whoTalkieServiceWorker(conn *ServiceConnection) {
 			if listener != nil {
 				// Read WhoTalkie audio packets (typically Opus)
 				buffer := make([]byte, 4096)
-				listener.SetReadDeadline(time.Now().Add(1 * time.Second))
+				if err := listener.SetReadDeadline(time.Now().Add(1 * time.Second)); err != nil {
+					log.Printf("Failed to set read deadline: %v", err)
+					continue
+				}
 				n, remoteAddr, err := listener.ReadFrom(buffer)
 				if err != nil {
 					if netErr, ok := err.(net.Error); !ok || !netErr.Timeout() {
@@ -797,7 +807,10 @@ func (r *AudioRouter) genericServiceWorker(conn *ServiceConnection) {
 				case <-r.ctx.Done():
 					return
 				default:
-					listener.(*net.TCPListener).SetDeadline(time.Now().Add(1 * time.Second))
+					if err := listener.(*net.TCPListener).SetDeadline(time.Now().Add(1 * time.Second)); err != nil {
+						log.Printf("Failed to set TCP deadline: %v", err)
+						continue
+					}
 					conn, err := listener.Accept()
 					if err != nil {
 						if netErr, ok := err.(net.Error); !ok || !netErr.Timeout() {
@@ -829,7 +842,10 @@ func (r *AudioRouter) genericServiceWorker(conn *ServiceConnection) {
 				return
 			default:
 				buffer := make([]byte, 4096)
-				packetListener.SetReadDeadline(time.Now().Add(1 * time.Second))
+				if err := packetListener.SetReadDeadline(time.Now().Add(1 * time.Second)); err != nil {
+					log.Printf("Failed to set read deadline: %v", err)
+					continue
+				}
 				n, remoteAddr, err := packetListener.ReadFrom(buffer)
 				if err != nil {
 					if netErr, ok := err.(net.Error); !ok || !netErr.Timeout() {
@@ -1252,17 +1268,13 @@ func (r *AudioRouter) handleUSRPPacket(service *ServiceInstance, data []byte, re
 		return nil // Skip other packet types
 	}
 	
-	if audioMsg != nil {
-		// Send to audio hub for routing
-		select {
-		case r.audioHub <- audioMsg:
-			return nil
-		case <-time.After(100 * time.Millisecond):
-			return fmt.Errorf("audio hub full, dropping packet")
-		}
+	// Send to audio hub for routing
+	select {
+	case r.audioHub <- audioMsg:
+		return nil
+	case <-time.After(100 * time.Millisecond):
+		return fmt.Errorf("audio hub full, dropping packet")
 	}
-	
-	return nil
 }
 
 func (r *AudioRouter) handleWhoTalkiePacket(service *ServiceInstance, data []byte, remoteAddr net.Addr) error {
@@ -1325,7 +1337,10 @@ func (r *AudioRouter) handleGenericTCPConnection(service *ServiceInstance, conn 
 		case <-r.ctx.Done():
 			return
 		default:
-			conn.SetReadDeadline(time.Now().Add(5 * time.Second))
+			if err := conn.SetReadDeadline(time.Now().Add(5 * time.Second)); err != nil {
+				log.Printf("Failed to set TCP read deadline: %v", err)
+				return
+			}
 			n, err := conn.Read(buffer)
 			if err != nil {
 				if netErr, ok := err.(net.Error); !ok || !netErr.Timeout() {
