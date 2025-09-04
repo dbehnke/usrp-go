@@ -65,10 +65,18 @@ curl http://localhost:9090/status
 make test-integration-logs
 
 # Monitor network traffic
-docker-compose -f test/integration/docker-compose.yml exec audio-router \
-  tcpdump -i any -n 'udp'
+# Prefer the Docker Compose plugin ("docker compose") or use the repo shim at
+# `./scripts/docker_compose.sh` which prefers the plugin and falls back to
+# the standalone binary.
+# Example (plugin):
+#   docker compose -f test/integration/docker-compose.yml exec audio-router \
+#     tcpdump -i any -n 'udp'
+# Example (shim):
+#   ./scripts/docker_compose.sh -f test/integration/docker-compose.yml exec audio-router \
+#     tcpdump -i any -n 'udp'
 
 # Cleanup when done
+
 make test-integration-clean
 ```
 

@@ -1,6 +1,6 @@
 module github.com/dbehnke/usrp-go/ci/dagger
 
-go 1.23.0
+go 1.25
 
 require (
 	dagger.io/dagger v0.18.16 // indirect

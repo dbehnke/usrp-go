@@ -98,34 +98,34 @@ build-audio-router:
 # Integration Testing targets
 test-integration-build:
 	@echo "Building Docker containers for integration testing..."
-	@docker-compose -f test/integration/docker-compose.yml build
+	@./scripts/docker_compose.sh -f test/integration/docker-compose.yml build
 
 test-integration-up:
 	@echo "Starting integration test environment..."
-	@docker-compose -f test/integration/docker-compose.yml up -d
+	@./scripts/docker_compose.sh -f test/integration/docker-compose.yml up -d
 	@sleep 10  # Wait for services to start
 
 test-integration-down:
 	@echo "Stopping integration test environment..."
-	@docker-compose -f test/integration/docker-compose.yml down
+	@./scripts/docker_compose.sh -f test/integration/docker-compose.yml down
 
 test-integration-run:
 	@echo "Running comprehensive integration tests..."
-	@docker-compose -f test/integration/docker-compose.yml exec test-validator /app/run-integration-tests.sh
+	@./scripts/docker_compose.sh -f test/integration/docker-compose.yml exec test-validator /app/run-integration-tests.sh
 
 test-integration: test-integration-build test-integration-up
 	@echo "Running complete integration test suite..."
 	@sleep 15  # Wait for all services to be ready
-	@docker-compose -f test/integration/docker-compose.yml exec test-validator /app/run-integration-tests.sh || true
+	@./scripts/docker_compose.sh -f test/integration/docker-compose.yml exec test-validator /app/run-integration-tests.sh || true
 	@make test-integration-down
 
 test-integration-logs:
 	@echo "Showing integration test logs..."
-	@docker-compose -f test/integration/docker-compose.yml logs
+	@./scripts/docker_compose.sh -f test/integration/docker-compose.yml logs
 
 test-integration-clean:
 	@echo "Cleaning up integration test environment..."
-	@docker-compose -f test/integration/docker-compose.yml down -v
+	@./scripts/docker_compose.sh -f test/integration/docker-compose.yml down -v
 	@docker system prune -f
 
 # Tilt Development Environment targets  

@@ -253,39 +253,39 @@ build-router:
 test-integration: integration-build integration-up
     @echo "🧪 Running complete integration test suite..."
     sleep 15  # Wait for all services to be ready
-    @env bash -lc 'set -o pipefail; docker-compose -f test/integration/docker-compose.yml run --rm test-validator /usr/local/bin/run-integration-tests.sh || true; ./scripts/print-exit-status'
+    @env bash -lc 'set -o pipefail; ./scripts/docker_compose.sh -f test/integration/docker-compose.yml run --rm test-validator /usr/local/bin/run-integration-tests.sh || true; ./scripts/print-exit-status'
     @env bash -lc 'just integration-down; ./scripts/print-exit-status'
 
 # Build integration test containers
 integration-build:
     @echo "🔨 Building Docker containers for integration testing..."
-    @env bash -lc 'set -o pipefail; docker-compose -f test/integration/docker-compose.yml build; ./scripts/print-exit-status'
+    @env bash -lc 'set -o pipefail; ./scripts/docker_compose.sh -f test/integration/docker-compose.yml build; ./scripts/print-exit-status'
 
 # Start integration test environment
 integration-up:
     @echo "🚀 Starting integration test environment..."
-    @env bash -lc 'set -o pipefail; docker-compose -f test/integration/docker-compose.yml up -d; ./scripts/print-exit-status'
+    @env bash -lc 'set -o pipefail; ./scripts/docker_compose.sh -f test/integration/docker-compose.yml up -d; ./scripts/print-exit-status'
     sleep 10  # Wait for services to start
 
 # Stop integration test environment
 integration-down:
     @echo "🛑 Stopping integration test environment..."
-    @env bash -lc 'set -o pipefail; docker-compose -f test/integration/docker-compose.yml down; ./scripts/print-exit-status'
+    @env bash -lc 'set -o pipefail; ./scripts/docker_compose.sh -f test/integration/docker-compose.yml down; ./scripts/print-exit-status'
 
 # Run integration tests (assumes environment is running)
 integration-run:
     @echo "🏃 Running integration tests..."
-    @env bash -lc 'set -o pipefail; docker-compose -f test/integration/docker-compose.yml run --rm test-validator /usr/local/bin/run-integration-tests.sh; ./scripts/print-exit-status'
+    @env bash -lc 'set -o pipefail; ./scripts/docker_compose.sh -f test/integration/docker-compose.yml run --rm test-validator /usr/local/bin/run-integration-tests.sh; ./scripts/print-exit-status'
 
 # Show integration test logs
 integration-logs:
     @echo "📋 Showing integration test logs..."
-    @env bash -lc 'set -o pipefail; docker-compose -f test/integration/docker-compose.yml logs; ./scripts/print-exit-status'
+    @env bash -lc 'set -o pipefail; ./scripts/docker_compose.sh -f test/integration/docker-compose.yml logs; ./scripts/print-exit-status'
 
 # Clean up integration test environment
 integration-clean:
     @echo "🧹 Cleaning up integration test environment..."
-    @env bash -lc 'set -o pipefail; docker-compose -f test/integration/docker-compose.yml down -v; docker system prune -f; ./scripts/print-exit-status'
+    @env bash -lc 'set -o pipefail; ./scripts/docker_compose.sh -f test/integration/docker-compose.yml down -v; docker system prune -f; ./scripts/print-exit-status'
 
 # =============================================================================
 # Tilt Development Environment Commands
