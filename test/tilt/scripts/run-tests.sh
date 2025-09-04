@@ -21,6 +21,30 @@ AUDIO_ROUTER_URL="${AUDIO_ROUTER_URL:-http://localhost:9090}"
 TEST_DURATION="${TEST_DURATION:-60}"
 VERBOSE="${VERBOSE:-false}"
 
+# Helper: delegate to repository shim which handles plugin, legacy binary,
+# and a best-effort DinD fallback (downloads standalone compose if needed).
+docker_compose() {
+    # Prefer repo-local shim when present
+    if [ -x "$(pwd)/scripts/docker_compose.sh" ]; then
+        "$(pwd)/scripts/docker_compose.sh" "$@"
+        return $?
+    fi
+
+    # Fall back to global shim or binaries if shim is not available
+    if command -v docker >/dev/null 2>&1 && docker compose version >/dev/null 2>&1; then
+        docker compose "$@"
+        return $?
+    fi
+
+    if command -v docker-compose >/dev/null 2>&1; then
+        docker-compose "$@"
+        return $?
+    fi
+
+    echo "Error: neither repository shim nor docker compose/docker-compose available" >&2
+    return 127
+}
+
 log() {
     echo -e "${BLUE}[$(date +'%H:%M:%S')] INFO:${NC} $1"
 }
