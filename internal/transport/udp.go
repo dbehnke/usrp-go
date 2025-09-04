@@ -87,7 +87,8 @@ func NewUDPConnection(config *ConnectionConfig) (*UDPConnection, error) {
 		handlers:   make(map[usrp.PacketType]MessageHandler),
 		bufferPool: sync.Pool{
 			New: func() interface{} {
-				return make([]byte, usrp.MaxPayloadSize+64) // Header + max payload
+				buf := make([]byte, usrp.MaxPayloadSize+64) // Header + max payload
+				return &buf
 			},
 		},
 	}
@@ -176,12 +177,13 @@ func (uc *UDPConnection) ReceiveMessage() (usrp.Message, error) {
 	}
 
 	// Get buffer from pool
-	buffer := uc.bufferPool.Get().([]byte)
-	defer uc.bufferPool.Put(buffer)
+	bufferPtr := uc.bufferPool.Get().(*[]byte)
+	buffer := *bufferPtr
 
 	// Read from UDP
 	n, addr, err := uc.conn.ReadFromUDP(buffer)
 	if err != nil {
+		uc.bufferPool.Put(bufferPtr)
 		return nil, fmt.Errorf("failed to read UDP packet: %w", err)
 	}
 
@@ -192,6 +194,7 @@ func (uc *UDPConnection) ReceiveMessage() (usrp.Message, error) {
 
 	// Parse packet type from header
 	if n < usrp.HeaderSize { // Minimum header size is 32 bytes
+		uc.bufferPool.Put(bufferPtr)
 		return nil, fmt.Errorf("packet too small: %d bytes", n)
 	}
 
@@ -216,13 +219,16 @@ func (uc *UDPConnection) ReceiveMessage() (usrp.Message, error) {
 	case usrp.USRP_TYPE_VOICE_ADPCM:
 		msg = &usrp.VoiceADPCMMessage{}
 	default:
+		uc.bufferPool.Put(bufferPtr)
 		return nil, fmt.Errorf("unknown packet type: %d", packetType)
 	}
 
 	if err := msg.Unmarshal(buffer[:n]); err != nil {
+		uc.bufferPool.Put(bufferPtr)
 		return nil, fmt.Errorf("failed to unmarshal message: %w", err)
 	}
 
+	uc.bufferPool.Put(bufferPtr)
 	return msg, nil
 }
 
@@ -245,7 +251,9 @@ func (uc *UDPConnection) Start(ctx context.Context) error {
 			return ctx.Err()
 		default:
 			// Set read timeout
-			uc.conn.SetReadDeadline(time.Now().Add(time.Second))
+			if err := uc.conn.SetReadDeadline(time.Now().Add(time.Second)); err != nil {
+				return fmt.Errorf("failed to set read deadline: %w", err)
+			}
 
 			msg, err := uc.ReceiveMessage()
 			if err != nil {

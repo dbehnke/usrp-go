@@ -12,17 +12,33 @@ func (v *VoiceMessage) Marshal() ([]byte, error) {
 	
 	// Write 32-byte header in network byte order (big-endian)
 	buf.Write(v.Header.Eye[:])
-	binary.Write(buf, binary.BigEndian, v.Header.Seq)
-	binary.Write(buf, binary.BigEndian, v.Header.Memory)
-	binary.Write(buf, binary.BigEndian, v.Header.Keyup)
-	binary.Write(buf, binary.BigEndian, v.Header.TalkGroup)
-	binary.Write(buf, binary.BigEndian, v.Header.Type)
-	binary.Write(buf, binary.BigEndian, v.Header.MpxID)
-	binary.Write(buf, binary.BigEndian, v.Header.Reserved)
+	if err := binary.Write(buf, binary.BigEndian, v.Header.Seq); err != nil {
+		return nil, fmt.Errorf("error writing seq: %w", err)
+	}
+	if err := binary.Write(buf, binary.BigEndian, v.Header.Memory); err != nil {
+		return nil, fmt.Errorf("error writing memory: %w", err)
+	}
+	if err := binary.Write(buf, binary.BigEndian, v.Header.Keyup); err != nil {
+		return nil, fmt.Errorf("error writing keyup: %w", err)
+	}
+	if err := binary.Write(buf, binary.BigEndian, v.Header.TalkGroup); err != nil {
+		return nil, fmt.Errorf("error writing talk group: %w", err)
+	}
+	if err := binary.Write(buf, binary.BigEndian, v.Header.Type); err != nil {
+		return nil, fmt.Errorf("error writing type: %w", err)
+	}
+	if err := binary.Write(buf, binary.BigEndian, v.Header.MpxID); err != nil {
+		return nil, fmt.Errorf("error writing mpx id: %w", err)
+	}
+	if err := binary.Write(buf, binary.BigEndian, v.Header.Reserved); err != nil {
+		return nil, fmt.Errorf("error writing reserved: %w", err)
+	}
 	
 	// Write 160 audio samples in little-endian (as per specification)
-	for _, sample := range v.AudioData {
-		binary.Write(buf, binary.LittleEndian, sample)
+	for i, sample := range v.AudioData {
+		if err := binary.Write(buf, binary.LittleEndian, sample); err != nil {
+			return nil, fmt.Errorf("error writing sample %d: %w", i, err)
+		}
 	}
 	
 	return buf.Bytes(), nil
@@ -37,14 +53,30 @@ func (v *VoiceMessage) Unmarshal(data []byte) error {
 	buf := bytes.NewReader(data)
 	
 	// Read 32-byte header in network byte order
-	buf.Read(v.Header.Eye[:])
-	binary.Read(buf, binary.BigEndian, &v.Header.Seq)
-	binary.Read(buf, binary.BigEndian, &v.Header.Memory)
-	binary.Read(buf, binary.BigEndian, &v.Header.Keyup)
-	binary.Read(buf, binary.BigEndian, &v.Header.TalkGroup)
-	binary.Read(buf, binary.BigEndian, &v.Header.Type)
-	binary.Read(buf, binary.BigEndian, &v.Header.MpxID)
-	binary.Read(buf, binary.BigEndian, &v.Header.Reserved)
+	if _, err := buf.Read(v.Header.Eye[:]); err != nil {
+		return fmt.Errorf("error reading eye: %w", err)
+	}
+	if err := binary.Read(buf, binary.BigEndian, &v.Header.Seq); err != nil {
+		return fmt.Errorf("error reading seq: %w", err)
+	}
+	if err := binary.Read(buf, binary.BigEndian, &v.Header.Memory); err != nil {
+		return fmt.Errorf("error reading memory: %w", err)
+	}
+	if err := binary.Read(buf, binary.BigEndian, &v.Header.Keyup); err != nil {
+		return fmt.Errorf("error reading keyup: %w", err)
+	}
+	if err := binary.Read(buf, binary.BigEndian, &v.Header.TalkGroup); err != nil {
+		return fmt.Errorf("error reading talk group: %w", err)
+	}
+	if err := binary.Read(buf, binary.BigEndian, &v.Header.Type); err != nil {
+		return fmt.Errorf("error reading type: %w", err)
+	}
+	if err := binary.Read(buf, binary.BigEndian, &v.Header.MpxID); err != nil {
+		return fmt.Errorf("error reading mpx id: %w", err)
+	}
+	if err := binary.Read(buf, binary.BigEndian, &v.Header.Reserved); err != nil {
+		return fmt.Errorf("error reading reserved: %w", err)
+	}
 	
 	// Validate header
 	if err := validateHeader(&v.Header); err != nil {
@@ -81,13 +113,27 @@ func (d *DTMFMessage) Marshal() ([]byte, error) {
 	
 	// Write 32-byte header
 	buf.Write(d.Header.Eye[:])
-	binary.Write(buf, binary.BigEndian, d.Header.Seq)
-	binary.Write(buf, binary.BigEndian, d.Header.Memory)
-	binary.Write(buf, binary.BigEndian, d.Header.Keyup)
-	binary.Write(buf, binary.BigEndian, d.Header.TalkGroup)
-	binary.Write(buf, binary.BigEndian, d.Header.Type)
-	binary.Write(buf, binary.BigEndian, d.Header.MpxID)
-	binary.Write(buf, binary.BigEndian, d.Header.Reserved)
+	if err := binary.Write(buf, binary.BigEndian, d.Header.Seq); err != nil {
+		return nil, fmt.Errorf("error writing seq: %w", err)
+	}
+	if err := binary.Write(buf, binary.BigEndian, d.Header.Memory); err != nil {
+		return nil, fmt.Errorf("error writing memory: %w", err)
+	}
+	if err := binary.Write(buf, binary.BigEndian, d.Header.Keyup); err != nil {
+		return nil, fmt.Errorf("error writing keyup: %w", err)
+	}
+	if err := binary.Write(buf, binary.BigEndian, d.Header.TalkGroup); err != nil {
+		return nil, fmt.Errorf("error writing talk group: %w", err)
+	}
+	if err := binary.Write(buf, binary.BigEndian, d.Header.Type); err != nil {
+		return nil, fmt.Errorf("error writing type: %w", err)
+	}
+	if err := binary.Write(buf, binary.BigEndian, d.Header.MpxID); err != nil {
+		return nil, fmt.Errorf("error writing mpx id: %w", err)
+	}
+	if err := binary.Write(buf, binary.BigEndian, d.Header.Reserved); err != nil {
+		return nil, fmt.Errorf("error writing reserved: %w", err)
+	}
 	
 	// Write DTMF digit
 	buf.WriteByte(d.Digit)
@@ -104,14 +150,30 @@ func (d *DTMFMessage) Unmarshal(data []byte) error {
 	buf := bytes.NewReader(data)
 	
 	// Read header
-	buf.Read(d.Header.Eye[:])
-	binary.Read(buf, binary.BigEndian, &d.Header.Seq)
-	binary.Read(buf, binary.BigEndian, &d.Header.Memory)
-	binary.Read(buf, binary.BigEndian, &d.Header.Keyup)
-	binary.Read(buf, binary.BigEndian, &d.Header.TalkGroup)
-	binary.Read(buf, binary.BigEndian, &d.Header.Type)
-	binary.Read(buf, binary.BigEndian, &d.Header.MpxID)
-	binary.Read(buf, binary.BigEndian, &d.Header.Reserved)
+	if _, err := buf.Read(d.Header.Eye[:]); err != nil {
+		return fmt.Errorf("error reading eye: %w", err)
+	}
+	if err := binary.Read(buf, binary.BigEndian, &d.Header.Seq); err != nil {
+		return fmt.Errorf("error reading seq: %w", err)
+	}
+	if err := binary.Read(buf, binary.BigEndian, &d.Header.Memory); err != nil {
+		return fmt.Errorf("error reading memory: %w", err)
+	}
+	if err := binary.Read(buf, binary.BigEndian, &d.Header.Keyup); err != nil {
+		return fmt.Errorf("error reading keyup: %w", err)
+	}
+	if err := binary.Read(buf, binary.BigEndian, &d.Header.TalkGroup); err != nil {
+		return fmt.Errorf("error reading talk group: %w", err)
+	}
+	if err := binary.Read(buf, binary.BigEndian, &d.Header.Type); err != nil {
+		return fmt.Errorf("error reading type: %w", err)
+	}
+	if err := binary.Read(buf, binary.BigEndian, &d.Header.MpxID); err != nil {
+		return fmt.Errorf("error reading mpx id: %w", err)
+	}
+	if err := binary.Read(buf, binary.BigEndian, &d.Header.Reserved); err != nil {
+		return fmt.Errorf("error reading reserved: %w", err)
+	}
 	
 	if err := validateHeader(&d.Header); err != nil {
 		return err
@@ -147,13 +209,27 @@ func (t *TextMessage) Marshal() ([]byte, error) {
 	
 	// Write header
 	buf.Write(t.Header.Eye[:])
-	binary.Write(buf, binary.BigEndian, t.Header.Seq)
-	binary.Write(buf, binary.BigEndian, t.Header.Memory)
-	binary.Write(buf, binary.BigEndian, t.Header.Keyup)
-	binary.Write(buf, binary.BigEndian, t.Header.TalkGroup)
-	binary.Write(buf, binary.BigEndian, t.Header.Type)
-	binary.Write(buf, binary.BigEndian, t.Header.MpxID)
-	binary.Write(buf, binary.BigEndian, t.Header.Reserved)
+	if err := binary.Write(buf, binary.BigEndian, t.Header.Seq); err != nil {
+		return nil, fmt.Errorf("error writing seq: %w", err)
+	}
+	if err := binary.Write(buf, binary.BigEndian, t.Header.Memory); err != nil {
+		return nil, fmt.Errorf("error writing memory: %w", err)
+	}
+	if err := binary.Write(buf, binary.BigEndian, t.Header.Keyup); err != nil {
+		return nil, fmt.Errorf("error writing keyup: %w", err)
+	}
+	if err := binary.Write(buf, binary.BigEndian, t.Header.TalkGroup); err != nil {
+		return nil, fmt.Errorf("error writing talk group: %w", err)
+	}
+	if err := binary.Write(buf, binary.BigEndian, t.Header.Type); err != nil {
+		return nil, fmt.Errorf("error writing type: %w", err)
+	}
+	if err := binary.Write(buf, binary.BigEndian, t.Header.MpxID); err != nil {
+		return nil, fmt.Errorf("error writing mpx id: %w", err)
+	}
+	if err := binary.Write(buf, binary.BigEndian, t.Header.Reserved); err != nil {
+		return nil, fmt.Errorf("error writing reserved: %w", err)
+	}
 	
 	// Write text data
 	buf.Write(t.Text)
@@ -170,14 +246,30 @@ func (t *TextMessage) Unmarshal(data []byte) error {
 	buf := bytes.NewReader(data)
 	
 	// Read header
-	buf.Read(t.Header.Eye[:])
-	binary.Read(buf, binary.BigEndian, &t.Header.Seq)
-	binary.Read(buf, binary.BigEndian, &t.Header.Memory)
-	binary.Read(buf, binary.BigEndian, &t.Header.Keyup)
-	binary.Read(buf, binary.BigEndian, &t.Header.TalkGroup)
-	binary.Read(buf, binary.BigEndian, &t.Header.Type)
-	binary.Read(buf, binary.BigEndian, &t.Header.MpxID)
-	binary.Read(buf, binary.BigEndian, &t.Header.Reserved)
+	if _, err := buf.Read(t.Header.Eye[:]); err != nil {
+		return fmt.Errorf("error reading eye: %w", err)
+	}
+	if err := binary.Read(buf, binary.BigEndian, &t.Header.Seq); err != nil {
+		return fmt.Errorf("error reading seq: %w", err)
+	}
+	if err := binary.Read(buf, binary.BigEndian, &t.Header.Memory); err != nil {
+		return fmt.Errorf("error reading memory: %w", err)
+	}
+	if err := binary.Read(buf, binary.BigEndian, &t.Header.Keyup); err != nil {
+		return fmt.Errorf("error reading keyup: %w", err)
+	}
+	if err := binary.Read(buf, binary.BigEndian, &t.Header.TalkGroup); err != nil {
+		return fmt.Errorf("error reading talk group: %w", err)
+	}
+	if err := binary.Read(buf, binary.BigEndian, &t.Header.Type); err != nil {
+		return fmt.Errorf("error reading type: %w", err)
+	}
+	if err := binary.Read(buf, binary.BigEndian, &t.Header.MpxID); err != nil {
+		return fmt.Errorf("error reading mpx id: %w", err)
+	}
+	if err := binary.Read(buf, binary.BigEndian, &t.Header.Reserved); err != nil {
+		return fmt.Errorf("error reading reserved: %w", err)
+	}
 	
 	if err := validateHeader(&t.Header); err != nil {
 		return err
@@ -187,7 +279,9 @@ func (t *TextMessage) Unmarshal(data []byte) error {
 	remaining := len(data) - HeaderSize
 	if remaining > 0 {
 		t.Text = make([]byte, remaining)
-		buf.Read(t.Text)
+		if _, err := buf.Read(t.Text); err != nil {
+			return fmt.Errorf("error reading text: %w", err)
+		}
 	}
 	
 	return nil
@@ -207,13 +301,27 @@ func (p *PingMessage) Marshal() ([]byte, error) {
 	
 	// Write header (ping has no payload)
 	buf.Write(p.Header.Eye[:])
-	binary.Write(buf, binary.BigEndian, p.Header.Seq)
-	binary.Write(buf, binary.BigEndian, p.Header.Memory)
-	binary.Write(buf, binary.BigEndian, p.Header.Keyup)
-	binary.Write(buf, binary.BigEndian, p.Header.TalkGroup)
-	binary.Write(buf, binary.BigEndian, p.Header.Type)
-	binary.Write(buf, binary.BigEndian, p.Header.MpxID)
-	binary.Write(buf, binary.BigEndian, p.Header.Reserved)
+	if err := binary.Write(buf, binary.BigEndian, p.Header.Seq); err != nil {
+		return nil, fmt.Errorf("error writing seq: %w", err)
+	}
+	if err := binary.Write(buf, binary.BigEndian, p.Header.Memory); err != nil {
+		return nil, fmt.Errorf("error writing memory: %w", err)
+	}
+	if err := binary.Write(buf, binary.BigEndian, p.Header.Keyup); err != nil {
+		return nil, fmt.Errorf("error writing keyup: %w", err)
+	}
+	if err := binary.Write(buf, binary.BigEndian, p.Header.TalkGroup); err != nil {
+		return nil, fmt.Errorf("error writing talk group: %w", err)
+	}
+	if err := binary.Write(buf, binary.BigEndian, p.Header.Type); err != nil {
+		return nil, fmt.Errorf("error writing type: %w", err)
+	}
+	if err := binary.Write(buf, binary.BigEndian, p.Header.MpxID); err != nil {
+		return nil, fmt.Errorf("error writing mpx id: %w", err)
+	}
+	if err := binary.Write(buf, binary.BigEndian, p.Header.Reserved); err != nil {
+		return nil, fmt.Errorf("error writing reserved: %w", err)
+	}
 	
 	return buf.Bytes(), nil
 }
@@ -227,14 +335,30 @@ func (p *PingMessage) Unmarshal(data []byte) error {
 	buf := bytes.NewReader(data)
 	
 	// Read header
-	buf.Read(p.Header.Eye[:])
-	binary.Read(buf, binary.BigEndian, &p.Header.Seq)
-	binary.Read(buf, binary.BigEndian, &p.Header.Memory)
-	binary.Read(buf, binary.BigEndian, &p.Header.Keyup)
-	binary.Read(buf, binary.BigEndian, &p.Header.TalkGroup)
-	binary.Read(buf, binary.BigEndian, &p.Header.Type)
-	binary.Read(buf, binary.BigEndian, &p.Header.MpxID)
-	binary.Read(buf, binary.BigEndian, &p.Header.Reserved)
+	if _, err := buf.Read(p.Header.Eye[:]); err != nil {
+		return fmt.Errorf("error reading eye: %w", err)
+	}
+	if err := binary.Read(buf, binary.BigEndian, &p.Header.Seq); err != nil {
+		return fmt.Errorf("error reading seq: %w", err)
+	}
+	if err := binary.Read(buf, binary.BigEndian, &p.Header.Memory); err != nil {
+		return fmt.Errorf("error reading memory: %w", err)
+	}
+	if err := binary.Read(buf, binary.BigEndian, &p.Header.Keyup); err != nil {
+		return fmt.Errorf("error reading keyup: %w", err)
+	}
+	if err := binary.Read(buf, binary.BigEndian, &p.Header.TalkGroup); err != nil {
+		return fmt.Errorf("error reading talk group: %w", err)
+	}
+	if err := binary.Read(buf, binary.BigEndian, &p.Header.Type); err != nil {
+		return fmt.Errorf("error reading type: %w", err)
+	}
+	if err := binary.Read(buf, binary.BigEndian, &p.Header.MpxID); err != nil {
+		return fmt.Errorf("error reading mpx id: %w", err)
+	}
+	if err := binary.Read(buf, binary.BigEndian, &p.Header.Reserved); err != nil {
+		return fmt.Errorf("error reading reserved: %w", err)
+	}
 	
 	return validateHeader(&p.Header)
 }
@@ -253,18 +377,34 @@ func (tlv *TLVMessage) Marshal() ([]byte, error) {
 	
 	// Write header
 	buf.Write(tlv.Header.Eye[:])
-	binary.Write(buf, binary.BigEndian, tlv.Header.Seq)
-	binary.Write(buf, binary.BigEndian, tlv.Header.Memory)
-	binary.Write(buf, binary.BigEndian, tlv.Header.Keyup)
-	binary.Write(buf, binary.BigEndian, tlv.Header.TalkGroup)
-	binary.Write(buf, binary.BigEndian, tlv.Header.Type)
-	binary.Write(buf, binary.BigEndian, tlv.Header.MpxID)
-	binary.Write(buf, binary.BigEndian, tlv.Header.Reserved)
+	if err := binary.Write(buf, binary.BigEndian, tlv.Header.Seq); err != nil {
+		return nil, fmt.Errorf("error writing seq: %w", err)
+	}
+	if err := binary.Write(buf, binary.BigEndian, tlv.Header.Memory); err != nil {
+		return nil, fmt.Errorf("error writing memory: %w", err)
+	}
+	if err := binary.Write(buf, binary.BigEndian, tlv.Header.Keyup); err != nil {
+		return nil, fmt.Errorf("error writing keyup: %w", err)
+	}
+	if err := binary.Write(buf, binary.BigEndian, tlv.Header.TalkGroup); err != nil {
+		return nil, fmt.Errorf("error writing talk group: %w", err)
+	}
+	if err := binary.Write(buf, binary.BigEndian, tlv.Header.Type); err != nil {
+		return nil, fmt.Errorf("error writing type: %w", err)
+	}
+	if err := binary.Write(buf, binary.BigEndian, tlv.Header.MpxID); err != nil {
+		return nil, fmt.Errorf("error writing mpx id: %w", err)
+	}
+	if err := binary.Write(buf, binary.BigEndian, tlv.Header.Reserved); err != nil {
+		return nil, fmt.Errorf("error writing reserved: %w", err)
+	}
 	
 	// Write TLV items
 	for _, item := range tlv.TLVs {
 		buf.WriteByte(byte(item.Tag))
-		binary.Write(buf, binary.BigEndian, item.Length)
+		if err := binary.Write(buf, binary.BigEndian, item.Length); err != nil {
+			return nil, fmt.Errorf("error writing tlv length: %w", err)
+		}
 		buf.Write(item.Value)
 	}
 	
@@ -280,14 +420,30 @@ func (tlv *TLVMessage) Unmarshal(data []byte) error {
 	buf := bytes.NewReader(data)
 	
 	// Read header
-	buf.Read(tlv.Header.Eye[:])
-	binary.Read(buf, binary.BigEndian, &tlv.Header.Seq)
-	binary.Read(buf, binary.BigEndian, &tlv.Header.Memory)
-	binary.Read(buf, binary.BigEndian, &tlv.Header.Keyup)
-	binary.Read(buf, binary.BigEndian, &tlv.Header.TalkGroup)
-	binary.Read(buf, binary.BigEndian, &tlv.Header.Type)
-	binary.Read(buf, binary.BigEndian, &tlv.Header.MpxID)
-	binary.Read(buf, binary.BigEndian, &tlv.Header.Reserved)
+	if _, err := buf.Read(tlv.Header.Eye[:]); err != nil {
+		return fmt.Errorf("error reading eye: %w", err)
+	}
+	if err := binary.Read(buf, binary.BigEndian, &tlv.Header.Seq); err != nil {
+		return fmt.Errorf("error reading seq: %w", err)
+	}
+	if err := binary.Read(buf, binary.BigEndian, &tlv.Header.Memory); err != nil {
+		return fmt.Errorf("error reading memory: %w", err)
+	}
+	if err := binary.Read(buf, binary.BigEndian, &tlv.Header.Keyup); err != nil {
+		return fmt.Errorf("error reading keyup: %w", err)
+	}
+	if err := binary.Read(buf, binary.BigEndian, &tlv.Header.TalkGroup); err != nil {
+		return fmt.Errorf("error reading talk group: %w", err)
+	}
+	if err := binary.Read(buf, binary.BigEndian, &tlv.Header.Type); err != nil {
+		return fmt.Errorf("error reading type: %w", err)
+	}
+	if err := binary.Read(buf, binary.BigEndian, &tlv.Header.MpxID); err != nil {
+		return fmt.Errorf("error reading mpx id: %w", err)
+	}
+	if err := binary.Read(buf, binary.BigEndian, &tlv.Header.Reserved); err != nil {
+		return fmt.Errorf("error reading reserved: %w", err)
+	}
 	
 	if err := validateHeader(&tlv.Header); err != nil {
 		return err
@@ -303,14 +459,18 @@ func (tlv *TLVMessage) Unmarshal(data []byte) error {
 		var item TLVItem
 		tag, _ := buf.ReadByte()
 		item.Tag = TLVTag(tag)
-		binary.Read(buf, binary.BigEndian, &item.Length)
+		if err := binary.Read(buf, binary.BigEndian, &item.Length); err != nil {
+			return fmt.Errorf("error reading tlv length: %w", err)
+		}
 		
 		if buf.Len() < int(item.Length) {
 			return fmt.Errorf("TLV item length exceeds remaining data")
 		}
 		
 		item.Value = make([]byte, item.Length)
-		buf.Read(item.Value)
+		if _, err := buf.Read(item.Value); err != nil {
+			return fmt.Errorf("error reading TLV value: %w", err)
+		}
 		tlv.TLVs = append(tlv.TLVs, item)
 	}
 	
@@ -331,13 +491,27 @@ func (u *VoiceULawMessage) Marshal() ([]byte, error) {
 	
 	// Write header
 	buf.Write(u.Header.Eye[:])
-	binary.Write(buf, binary.BigEndian, u.Header.Seq)
-	binary.Write(buf, binary.BigEndian, u.Header.Memory)
-	binary.Write(buf, binary.BigEndian, u.Header.Keyup)
-	binary.Write(buf, binary.BigEndian, u.Header.TalkGroup)
-	binary.Write(buf, binary.BigEndian, u.Header.Type)
-	binary.Write(buf, binary.BigEndian, u.Header.MpxID)
-	binary.Write(buf, binary.BigEndian, u.Header.Reserved)
+	if err := binary.Write(buf, binary.BigEndian, u.Header.Seq); err != nil {
+		return nil, fmt.Errorf("error writing seq: %w", err)
+	}
+	if err := binary.Write(buf, binary.BigEndian, u.Header.Memory); err != nil {
+		return nil, fmt.Errorf("error writing memory: %w", err)
+	}
+	if err := binary.Write(buf, binary.BigEndian, u.Header.Keyup); err != nil {
+		return nil, fmt.Errorf("error writing keyup: %w", err)
+	}
+	if err := binary.Write(buf, binary.BigEndian, u.Header.TalkGroup); err != nil {
+		return nil, fmt.Errorf("error writing talk group: %w", err)
+	}
+	if err := binary.Write(buf, binary.BigEndian, u.Header.Type); err != nil {
+		return nil, fmt.Errorf("error writing type: %w", err)
+	}
+	if err := binary.Write(buf, binary.BigEndian, u.Header.MpxID); err != nil {
+		return nil, fmt.Errorf("error writing mpx id: %w", err)
+	}
+	if err := binary.Write(buf, binary.BigEndian, u.Header.Reserved); err != nil {
+		return nil, fmt.Errorf("error writing reserved: %w", err)
+	}
 	
 	// Write μ-law samples
 	buf.Write(u.AudioData[:])
@@ -354,21 +528,39 @@ func (u *VoiceULawMessage) Unmarshal(data []byte) error {
 	buf := bytes.NewReader(data)
 	
 	// Read header
-	buf.Read(u.Header.Eye[:])
-	binary.Read(buf, binary.BigEndian, &u.Header.Seq)
-	binary.Read(buf, binary.BigEndian, &u.Header.Memory)
-	binary.Read(buf, binary.BigEndian, &u.Header.Keyup)
-	binary.Read(buf, binary.BigEndian, &u.Header.TalkGroup)
-	binary.Read(buf, binary.BigEndian, &u.Header.Type)
-	binary.Read(buf, binary.BigEndian, &u.Header.MpxID)
-	binary.Read(buf, binary.BigEndian, &u.Header.Reserved)
+	if _, err := buf.Read(u.Header.Eye[:]); err != nil {
+		return fmt.Errorf("error reading eye: %w", err)
+	}
+	if err := binary.Read(buf, binary.BigEndian, &u.Header.Seq); err != nil {
+		return fmt.Errorf("error reading seq: %w", err)
+	}
+	if err := binary.Read(buf, binary.BigEndian, &u.Header.Memory); err != nil {
+		return fmt.Errorf("error reading memory: %w", err)
+	}
+	if err := binary.Read(buf, binary.BigEndian, &u.Header.Keyup); err != nil {
+		return fmt.Errorf("error reading keyup: %w", err)
+	}
+	if err := binary.Read(buf, binary.BigEndian, &u.Header.TalkGroup); err != nil {
+		return fmt.Errorf("error reading talk group: %w", err)
+	}
+	if err := binary.Read(buf, binary.BigEndian, &u.Header.Type); err != nil {
+		return fmt.Errorf("error reading type: %w", err)
+	}
+	if err := binary.Read(buf, binary.BigEndian, &u.Header.MpxID); err != nil {
+		return fmt.Errorf("error reading mpx id: %w", err)
+	}
+	if err := binary.Read(buf, binary.BigEndian, &u.Header.Reserved); err != nil {
+		return fmt.Errorf("error reading reserved: %w", err)
+	}
 	
 	if err := validateHeader(&u.Header); err != nil {
 		return err
 	}
 	
 	// Read μ-law audio data
-	buf.Read(u.AudioData[:])
+	if _, err := buf.Read(u.AudioData[:]); err != nil {
+		return fmt.Errorf("error reading audio data: %w", err)
+	}
 	
 	return nil
 }
@@ -387,13 +579,27 @@ func (a *VoiceADPCMMessage) Marshal() ([]byte, error) {
 	
 	// Write header
 	buf.Write(a.Header.Eye[:])
-	binary.Write(buf, binary.BigEndian, a.Header.Seq)
-	binary.Write(buf, binary.BigEndian, a.Header.Memory)
-	binary.Write(buf, binary.BigEndian, a.Header.Keyup)
-	binary.Write(buf, binary.BigEndian, a.Header.TalkGroup)
-	binary.Write(buf, binary.BigEndian, a.Header.Type)
-	binary.Write(buf, binary.BigEndian, a.Header.MpxID)
-	binary.Write(buf, binary.BigEndian, a.Header.Reserved)
+	if err := binary.Write(buf, binary.BigEndian, a.Header.Seq); err != nil {
+		return nil, fmt.Errorf("error writing seq: %w", err)
+	}
+	if err := binary.Write(buf, binary.BigEndian, a.Header.Memory); err != nil {
+		return nil, fmt.Errorf("error writing memory: %w", err)
+	}
+	if err := binary.Write(buf, binary.BigEndian, a.Header.Keyup); err != nil {
+		return nil, fmt.Errorf("error writing keyup: %w", err)
+	}
+	if err := binary.Write(buf, binary.BigEndian, a.Header.TalkGroup); err != nil {
+		return nil, fmt.Errorf("error writing talk group: %w", err)
+	}
+	if err := binary.Write(buf, binary.BigEndian, a.Header.Type); err != nil {
+		return nil, fmt.Errorf("error writing type: %w", err)
+	}
+	if err := binary.Write(buf, binary.BigEndian, a.Header.MpxID); err != nil {
+		return nil, fmt.Errorf("error writing mpx id: %w", err)
+	}
+	if err := binary.Write(buf, binary.BigEndian, a.Header.Reserved); err != nil {
+		return nil, fmt.Errorf("error writing reserved: %w", err)
+	}
 	
 	// Write ADPCM data
 	buf.Write(a.AudioData)
@@ -410,14 +616,30 @@ func (a *VoiceADPCMMessage) Unmarshal(data []byte) error {
 	buf := bytes.NewReader(data)
 	
 	// Read header
-	buf.Read(a.Header.Eye[:])
-	binary.Read(buf, binary.BigEndian, &a.Header.Seq)
-	binary.Read(buf, binary.BigEndian, &a.Header.Memory)
-	binary.Read(buf, binary.BigEndian, &a.Header.Keyup)
-	binary.Read(buf, binary.BigEndian, &a.Header.TalkGroup)
-	binary.Read(buf, binary.BigEndian, &a.Header.Type)
-	binary.Read(buf, binary.BigEndian, &a.Header.MpxID)
-	binary.Read(buf, binary.BigEndian, &a.Header.Reserved)
+	if _, err := buf.Read(a.Header.Eye[:]); err != nil {
+		return fmt.Errorf("error reading eye: %w", err)
+	}
+	if err := binary.Read(buf, binary.BigEndian, &a.Header.Seq); err != nil {
+		return fmt.Errorf("error reading seq: %w", err)
+	}
+	if err := binary.Read(buf, binary.BigEndian, &a.Header.Memory); err != nil {
+		return fmt.Errorf("error reading memory: %w", err)
+	}
+	if err := binary.Read(buf, binary.BigEndian, &a.Header.Keyup); err != nil {
+		return fmt.Errorf("error reading keyup: %w", err)
+	}
+	if err := binary.Read(buf, binary.BigEndian, &a.Header.TalkGroup); err != nil {
+		return fmt.Errorf("error reading talk group: %w", err)
+	}
+	if err := binary.Read(buf, binary.BigEndian, &a.Header.Type); err != nil {
+		return fmt.Errorf("error reading type: %w", err)
+	}
+	if err := binary.Read(buf, binary.BigEndian, &a.Header.MpxID); err != nil {
+		return fmt.Errorf("error reading mpx id: %w", err)
+	}
+	if err := binary.Read(buf, binary.BigEndian, &a.Header.Reserved); err != nil {
+		return fmt.Errorf("error reading reserved: %w", err)
+	}
 	
 	if err := validateHeader(&a.Header); err != nil {
 		return err
@@ -427,7 +649,9 @@ func (a *VoiceADPCMMessage) Unmarshal(data []byte) error {
 	remaining := len(data) - HeaderSize
 	if remaining > 0 {
 		a.AudioData = make([]byte, remaining)
-		buf.Read(a.AudioData)
+		if _, err := buf.Read(a.AudioData); err != nil {
+			return fmt.Errorf("error reading ADPCM data: %w", err)
+		}
 	}
 	
 	return nil
