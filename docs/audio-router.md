@@ -45,6 +45,10 @@ The audio-router sits between audio sources (mocks, UDP producers, file playback
    - Test validator interacts with the router to verify end-to-end audio flows.
 ```
 
+  Diagram
+
+  ![Audio Router architecture diagram](docs/assets/audio-router.svg "Audio Router architecture")
+
 Configuration examples
 
 1) docker-compose service (excerpt)
