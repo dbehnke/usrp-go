@@ -30,3 +30,79 @@ References
 - test/containers/audio-router (implementation and Dockerfile)
 
 If you'd like, I can expand this page with architecture diagrams, example UDP packets, or a quickstart showing how to run the router and stream audio into it locally.
+
+Architecture (ASCII diagram)
+
+The audio-router sits between audio sources (mocks, UDP producers, file playback) and downstream consumers (Allstar mock, USRP adapters, test validator).
+
+```
+   +------------+       UDP/TCP/File       +--------------+      RPC/UDP     +------------+
+   | Audio Src  | ------------------------> | Audio Router | ---------------> | Allstar    |
+   | (mock/udp) |                          | (converter)  |                  | mock/USRP  |
+   +------------+                          +--------------+                  +------------+
+
+   - The router may spawn or configure codec/FFmpeg pipelines to transcode samples.
+   - Test validator interacts with the router to verify end-to-end audio flows.
+```
+
+Configuration examples
+
+1) docker-compose service (excerpt)
+
+```yaml
+services:
+  audio-router:
+    build:
+      context: ../..   # repo root
+      dockerfile: test/containers/audio-router/Dockerfile
+    image: usrp/audio-router:dev
+    environment:
+      - AUDIO_PORT=4010
+      - LOG_LEVEL=debug
+    networks:
+      - test-net
+    ports:
+      - "4010:4010/udp"
+```
+
+2) Example environment variables
+
+- AUDIO_PORT — UDP port to listen for incoming audio frames (default: 4010)
+- SAMPLE_RATE — expected sample rate for mixer/codec (e.g. 8000 or 16000)
+- LOG_LEVEL — logging verbosity (debug/info/warn/error)
+
+Quick runbook snippets
+
+Start the integration stack (uses repo shim or docker compose plugin):
+
+```bash
+# from repo root
+./scripts/docker_compose.sh -f test/integration/docker-compose.yml up --build -d
+./scripts/docker_compose.sh -f test/integration/docker-compose.yml logs -f audio-router
+```
+
+Stream a short test tone (local, using `socat` or `ffmpeg`):
+
+```bash
+# send a generated sine wave as raw u-law or PCM as appropriate to UDP port
+# using ffmpeg to generate 1s of sine and send to UDP
+ffmpeg -f lavfi -i "sine=frequency=1000:duration=1" -f mulaw udp://127.0.0.1:4010
+```
+
+Check router health and logs
+
+```bash
+docker ps --filter name=audio-router
+docker logs <audio-router-container-name> --tail 200
+```
+
+Common issues and remedies
+
+- Build context lstat errors: ensure `test/integration/docker-compose.yml` uses `context: ../..` when the Dockerfile references repo files.
+- Socket / port collisions: if port 4010 is already used locally, change `AUDIO_PORT` or stop the conflicting process.
+- Codec mismatch: confirm `SAMPLE_RATE` and sample format match the downstream consumer expectations (Allstar mock usually expects 8kHz mu-law/RTP-like frames).
+
+Extending this doc
+
+- I can add example payload captures (pcap) or a small script to generate compatible UDP frames for automated testing.
+- If you want image diagrams, I can add a rendered PNG to `docs/assets/` and reference it, but ASCII keeps the repo simple.
