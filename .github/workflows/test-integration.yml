@@ -1,0 +1,49 @@
+name: Integration Tests
+
+on:
+  push:
+    branches: [main, feature/*]
+  pull_request:
+    branches: [main]
+
+jobs:
+  dagger-run:
+    name: Dagger Integration Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Dagger CLI
+        run: |
+          echo "📦 Installing Dagger CLI..."
+          curl -L https://dl.dagger.io/dagger/install.sh | sudo sh
+          echo "🔍 Checking installation..."
+          # The installer puts dagger in ./bin/dagger, let's move it to /usr/local/bin
+          if [ -f "./bin/dagger" ]; then
+            echo "✅ Found dagger at ./bin/dagger, moving to /usr/local/bin/"
+            sudo mv ./bin/dagger /usr/local/bin/dagger
+            sudo chmod +x /usr/local/bin/dagger
+          else
+            echo "❌ Dagger not found at ./bin/dagger"
+            find . -name "dagger" -type f 2>/dev/null || echo "No dagger binary found anywhere"
+          fi
+
+      - name: Run Dagger pipeline
+        env:
+          CI: "true"
+          # Use GitHub Actions cache for Dagger engine
+          DAGGER_CLOUD_TOKEN: ${{ secrets.DAGGER_CLOUD_TOKEN }}
+        run: |
+          # Verify Dagger is available
+          if command -v /usr/local/bin/dagger >/dev/null 2>&1; then
+            echo "✅ Dagger found at /usr/local/bin/dagger"
+            /usr/local/bin/dagger version
+          else
+            echo "❌ Dagger not found at /usr/local/bin/dagger"
+            ls -la /usr/local/bin/ | grep -i dagger || echo "No dagger binary found"
+            exit 1
+          fi
+          # Run the tests
+          /usr/local/bin/dagger -m ci/dagger call test --source=.
+        timeout-minutes: 15

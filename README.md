@@ -10,11 +10,22 @@ A Go library implementing the official USRP (Universal Software Radio Protocol) 
 ✅ **Official USRP Protocol**: 32-byte header, correct packet types, network byte order  
 ✅ **All Packet Types**: Voice, DTMF, Text, Ping, TLV, μ-law, ADPCM  
 ✅ **Amateur Radio Ready**: PTT control, callsign metadata, talk groups  
+✅ **Audio Conversion**: FFmpeg integration for Opus/Ogg streaming formats  
+✅ **USRP Bridge Utility**: AllStarLink to internet service bridge with multi-destination support  
+✅ **Discord Integration**: Real-time bridge between amateur radio and Discord voice  
 ✅ **Production Tested**: Comprehensive test suite with all packet formats  
 ✅ **High Performance**: Efficient binary protocol handling  
 
 ## Quick Start
 
+### **System Requirements**
+- **macOS**: [Colima](https://github.com/abiosoft/colima) + Docker + Kubernetes (recommended)
+- **Linux**: Docker + kind/minikube + Kubernetes
+- **Windows**: WSL2 + Docker + Kubernetes
+
+**See [REQUIREMENTS.md](docs/REQUIREMENTS.md) for detailed setup instructions.**
+
+### **Installation**
 ```bash
 go get github.com/dbehnke/usrp-go
 ```
@@ -69,6 +80,119 @@ tlv.SetCallsign("W1AW")
 data, _ := tlv.Marshal()
 ```
 
+### Audio Format Conversion
+
+Convert between USRP and compressed formats using FFmpeg:
+
+```go
+// Convert USRP to Opus for internet streaming
+converter, _ := audio.NewOpusConverter()
+defer converter.Close()
+
+opusData, _ := converter.USRPToFormat(voiceMessage)
+// Send opusData over internet...
+
+// Convert back from Opus to USRP
+usrpMessages, _ := converter.FormatToUSRP(opusData)
+```
+
+See [`docs/AUDIO_CONVERSION.md`](docs/AUDIO_CONVERSION.md) for complete examples.
+
+### USRP Bridge Utility
+
+Connect AllStarLink nodes to internet services (WhoTalkie, Discord, etc.):
+
+```bash
+# Generate sample configuration
+just usrp-bridge-config
+
+# Edit usrp-bridge.json with your settings
+# Set your callsign, destinations, etc.
+
+# Run the bridge
+just usrp-bridge
+```
+
+**Architecture**: `AllStarLink Node <--USRP--> Bridge <--Opus--> Internet Services`
+
+See [`docs/USRP_BRIDGE.md`](docs/USRP_BRIDGE.md) for complete setup guide.
+
+### Discord Integration
+
+Connect amateur radio to Discord voice channels:
+
+```bash
+# Set up Discord bot token and amateur radio callsign
+export DISCORD_TOKEN="your_bot_token"
+export AMATEUR_CALLSIGN="N0CALL"
+
+# Test Discord connection
+just discord-test
+
+# Run the bridge
+just discord-bridge
+```
+
+See [`docs/DISCORD_BRIDGE.md`](docs/DISCORD_BRIDGE.md) for complete setup guide.
+
+### Audio Router Hub
+
+Hub-and-spoke audio routing for connecting multiple amateur radio services:
+
+```bash
+# Generate sample configuration
+just router-config
+
+# Edit audio-router.json with your settings
+# Configure AllStarLink nodes, WhoTalkie, Discord, etc.
+
+# Run the router
+just router-with-config
+```
+
+**Architecture**: Scalable N-to-N audio routing with service prioritization:
+```
+AllStarLink-1 ←┐
+AllStarLink-2 ←┤    ┌─→ WhoTalkie-1
+AllStarLink-N ←┤    │   WhoTalkie-2  
+               ├────┤   WhoTalkie-N
+Discord-1 ←────┤    │
+Discord-2 ←────┤    └─→ Generic-1
+Discord-N ←────┘        Generic-N
+```
+
+Features:
+- **Multi-service support**: USRP, WhoTalkie, Discord, Generic UDP/TCP
+- **N instances per service**: Run multiple AllStarLink nodes, Discord bots, etc.
+- **Smart routing**: Service-specific routing rules and conflict resolution  
+- **Priority management**: Higher priority transmissions can preempt lower priority ones
+- **Audio conversion**: Automatic format conversion between services (PCM ↔ Opus)
+- **Real-time monitoring**: HTTP status page and statistics
+- **Amateur radio integration**: PTT control, callsign metadata, talk groups
+
+See [`docs/AUDIO_ROUTER.md`](docs/AUDIO_ROUTER.md) for complete setup guide.
+
+### **🚀 Development Environment**
+
+**Quick start with Tilt (live reload development):**
+```bash
+# macOS with Colima (recommended)
+brew install colima docker kubectl tilt just
+colima start --cpu 4 --memory 8 --kubernetes
+
+# Start live development environment
+just dev             # Starts Tilt with live reload
+just tilt-dashboard  # Opens http://localhost:10350
+```
+
+**Features:**
+- **⚡ Live Reload**: Code changes trigger automatic rebuilds (2-3 seconds)
+- **📊 Visual Dashboard**: Beautiful UI with real-time service status and logs  
+- **🧪 Integrated Testing**: Run comprehensive integration tests with one command
+- **🎵 Amateur Radio Testing**: Realistic AllStarLink, WhoTalkie, Discord simulation
+
+See [`test/tilt/README.md`](test/tilt/README.md) for complete development environment guide.
+
 ## Protocol Specification
 
 ### Header Format (32 bytes, AllStarLink compatible)
@@ -105,16 +229,22 @@ Offset | Size | Field     | Description
 
 ```bash
 # Run protocol tests
-go run cmd/examples/main.go
+just run-example
 
 # Show all packet formats  
-go run cmd/examples/main.go formats
+just run-example formats
 
 # Run unit tests
-go test ./pkg/usrp/ -v
+just test
 
 # Run benchmarks
-go test -bench=. ./pkg/usrp/
+just bench
+
+# Test audio conversion (requires FFmpeg)
+just audio-test
+
+# Run integration tests via Dagger
+just dagger-test
 ```
 
 ### Example Output
@@ -194,26 +324,74 @@ usrp-go/
 │   ├── protocol.go        # Message types & structures  
 │   ├── marshal.go         # Binary serialization
 │   └── protocol_test.go   # Comprehensive tests
-├── cmd/examples/          # Demo applications
+├── pkg/audio/             # Audio format conversion
+│   ├── converter.go       # FFmpeg integration
+│   └── converter_test.go  # Conversion tests
+├── pkg/discord/           # Discord voice integration
+│   ├── bot.go            # Discord bot with voice capabilities
+│   ├── bridge.go         # USRP-Discord audio bridge
+│   └── bridge_test.go    # Discord integration tests
+├── cmd/examples/          # Protocol demo applications
 │   └── main.go           # Protocol compatibility tests
-└── internal/transport/    # UDP transport layer (WIP)
-    └── udp.go            # Network handling
+├── cmd/audio-bridge/      # Audio conversion demos
+│   └── main.go           # Audio bridge examples
+├── cmd/usrp-bridge/       # USRP bridge utility
+│   └── main.go           # AllStarLink to internet bridge
+├── cmd/discord-bridge/    # Discord integration demos
+│   └── main.go           # Discord bridge examples
+├── cmd/audio-router/      # Audio Router Hub
+│   └── main.go           # Hub-and-spoke audio routing service
+├── docs/                  # Complete documentation suite
+│   ├── REQUIREMENTS.md         # System requirements & setup (macOS/Linux/Windows)
+│   ├── AUDIO_CONVERSION.md     # Audio conversion guide
+│   ├── USRP_BRIDGE.md         # USRP bridge utility guide
+│   ├── DISCORD_BRIDGE.md      # Discord integration guide
+│   └── AUDIO_ROUTER.md        # Audio Router Hub setup guide
+├── ci/dagger/                 # Dagger integration testing
+│   ├── main.go                # Integration test pipeline
+│   └── dagger.json            # Dagger module configuration
+├── test/                      # Comprehensive testing framework
+│   ├── tilt/                  # Tilt development environment
+│   │   ├── README.md          # Development environment guide
+│   │   ├── Tiltfile           # Live reload orchestration
+│   │   ├── k8s/               # Kubernetes manifests
+│   │   └── scripts/           # Integration testing scripts
+│   └── integration/           # Integration test resources
+└── internal/transport/        # UDP transport layer (WIP)
+    └── udp.go                # Network handling
 ```
 
 ## Contributing
 
 This implementation prioritizes **exact compatibility** with existing USRP deployments. Before making changes:
 
-1. Verify against AllStarLink `chan_usrp.c` source
-2. Test with existing AllStarLink systems  
-3. Maintain binary protocol compatibility
-4. Add comprehensive tests
+1. **Create a pull request** - The `main` branch is protected and requires PR reviews
+2. **Pass integration tests** - Dagger Integration Tests must succeed before merging  
+3. Verify against AllStarLink `chan_usrp.c` source
+4. Test with existing AllStarLink systems  
+5. Maintain binary protocol compatibility
+6. Add comprehensive tests
+
+### Branch Protection 🔒
+
+The `main` branch has protection rules enabled:
+- ✅ **Pull request required** - No direct pushes to main
+- ✅ **Integration tests required** - All 23+ test cases must pass
+- ✅ **Code review required** - At least 1 approving review needed
+- ✅ **Branch must be up-to-date** - Must merge latest changes first
+
+Run tests locally before creating PRs:
+```bash
+just dagger-test  # Runs comprehensive integration test suite
+```
 
 ## Amateur Radio Applications
 
 Perfect for:
 - **AllStarLink node linking**
 - **Digital voice bridging**
+- **Internet service integration** (WhoTalkie, Discord)
+- **Discord-amateur radio integration**
 - **Experimental amateur radio protocols**
 - **Emergency communication systems**
 

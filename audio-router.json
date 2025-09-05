@@ -1,0 +1,138 @@
+{
+  "router": {
+    "name": "Amateur Radio Audio Router Hub",
+    "description": "Hub-and-spoke audio routing for amateur radio services",
+    "listen_addr": "0.0.0.0",
+    "status_port": 9090
+  },
+  "audio": {
+    "buffer_size": 1000,
+    "processing_delay": 10,
+    "max_concurrent_tx": 3,
+    "tx_timeout_seconds": 30,
+    "enable_conversion": false,
+    "default_format": "pcm"
+  },
+  "routing": {
+    "prevent_loops": true,
+    "enable_priority_rules": true,
+    "default_routing": "all-to-all",
+    "blocked_pairs": []
+  },
+  "amateur": {
+    "station_call": "W1AW",
+    "default_talk_group": 1,
+    "require_valid_call": false,
+    "log_transmissions": true
+  },
+  "services": [
+    {
+      "id": "allstar_1",
+      "type": "usrp",
+      "name": "AllStarLink Node 12345",
+      "description": "Primary AllStarLink node",
+      "enabled": true,
+      "network": {
+        "protocol": "udp",
+        "listen_addr": "0.0.0.0",
+        "listen_port": 32001,
+        "remote_addr": "127.0.0.1",
+        "remote_port": 34001
+      },
+      "audio": {
+        "format": "pcm",
+        "sample_rate": 8000,
+        "channels": 1,
+        "bitrate": 0
+      },
+      "routing": {
+        "can_send": true,
+        "can_receive": true,
+        "send_to_types": [
+          "whotalkie",
+          "discord"
+        ],
+        "receive_from": [
+          "whotalkie",
+          "discord"
+        ],
+        "exclude_services": null,
+        "priority": 5
+      }
+    },
+    {
+      "id": "whotalkie_1",
+      "type": "whotalkie",
+      "name": "WhoTalkie Service 1",
+      "description": "WhoTalkie internet service",
+      "enabled": true,
+      "network": {
+        "protocol": "udp",
+        "listen_addr": "0.0.0.0",
+        "listen_port": 32002,
+        "remote_addr": "whotalkie.example.com",
+        "remote_port": 8080
+      },
+      "audio": {
+        "format": "pcm",
+        "sample_rate": 8000,
+        "channels": 1,
+        "bitrate": 0
+      },
+      "routing": {
+        "can_send": true,
+        "can_receive": true,
+        "send_to_types": [
+          "usrp",
+          "discord"
+        ],
+        "receive_from": [
+          "usrp",
+          "discord"
+        ],
+        "exclude_services": null,
+        "priority": 3
+      }
+    },
+    {
+      "id": "discord_1",
+      "type": "discord",
+      "name": "Discord Bridge Bot",
+      "description": "Discord voice channel bridge",
+      "enabled": false,
+      "network": {
+        "protocol": "",
+        "listen_addr": "",
+        "listen_port": 0,
+        "remote_addr": "",
+        "remote_port": 0
+      },
+      "audio": {
+        "format": "pcm",
+        "sample_rate": 48000,
+        "channels": 2,
+        "bitrate": 128000
+      },
+      "settings": {
+        "bot_token": "YOUR_DISCORD_BOT_TOKEN",
+        "callsign": "W1AW",
+        "channel_id": "987654321",
+        "guild_id": "123456789"
+      },
+      "routing": {
+        "can_send": true,
+        "can_receive": true,
+        "send_to_types": [
+          "usrp",
+          "whotalkie"
+        ],
+        "receive_from": [
+          "usrp",
+          "whotalkie"
+        ],
+        "exclude_services": null,
+        "priority": 3
+      }
+    }
+  ]
+}

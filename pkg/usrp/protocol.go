@@ -1,4 +1,4 @@
-// Package usrp provides a Go library for handling USRP (Universal Software Radio Protocol) 
+// Package usrp provides a Go library for handling USRP (Universal Software Radio Protocol)
 // packets used in amateur radio digital voice systems.
 //
 // This implementation is compatible with AllStarLink's chan_usrp.c and the official
@@ -11,10 +11,10 @@ import (
 
 // Protocol constants based on official specification
 const (
-	USRPMagic      = "USRP"  // 4-byte magic string
-	HeaderSize     = 32      // Fixed 32-byte header
-	VoiceFrameSize = 160     // 160 samples per voice frame (20ms at 8kHz)
-	MaxPayloadSize = 1024    // Maximum payload size
+	USRPMagic      = "USRP" // 4-byte magic string
+	HeaderSize     = 32     // Fixed 32-byte header
+	VoiceFrameSize = 160    // 160 samples per voice frame (20ms at 8kHz)
+	MaxPayloadSize = 1024   // Maximum payload size
 )
 
 // PacketType defines the type of USRP packet (matches official enum)
@@ -22,7 +22,7 @@ type PacketType uint32
 
 const (
 	USRP_TYPE_VOICE       PacketType = 0 // Voice audio data
-	USRP_TYPE_DTMF        PacketType = 1 // DTMF signaling 
+	USRP_TYPE_DTMF        PacketType = 1 // DTMF signaling
 	USRP_TYPE_TEXT        PacketType = 2 // Text/metadata
 	USRP_TYPE_PING        PacketType = 3 // Ping/keepalive
 	USRP_TYPE_TLV         PacketType = 4 // TLV (Type-Length-Value) data

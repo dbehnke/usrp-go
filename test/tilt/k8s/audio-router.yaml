@@ -1,0 +1,271 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: audio-router
+  labels:
+    app: audio-router
+    component: core
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: audio-router
+  template:
+    metadata:
+      labels:
+        app: audio-router
+        component: core
+    spec:
+      containers:
+        - name: audio-router
+          image: audio-router
+          ports:
+            - containerPort: 9090
+              name: http-status
+              protocol: TCP
+            - containerPort: 32001
+              name: usrp-1
+              protocol: UDP
+            - containerPort: 32002
+              name: usrp-2
+              protocol: UDP
+            - containerPort: 32003
+              name: whotalkie-1
+              protocol: UDP
+            - containerPort: 32004
+              name: whotalkie-2
+              protocol: UDP
+            - containerPort: 32005
+              name: discord
+              protocol: TCP
+          env:
+            - name: CONFIG_FILE
+              value: "/app/config/audio-router-dev.json"
+            - name: VERBOSE
+              value: "true"
+            - name: DEBUG
+              value: "false"
+          volumeMounts:
+            - name: config
+              mountPath: /app/config
+              readOnly: true
+            - name: audio-samples
+              mountPath: /app/audio-samples
+            - name: test-results
+              mountPath: /app/test-results
+          livenessProbe:
+            httpGet:
+              path: /status
+              port: 9090
+            initialDelaySeconds: 10
+            periodSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /status
+              port: 9090
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+      volumes:
+        - name: config
+          configMap:
+            name: audio-router-config
+        - name: audio-samples
+          emptyDir: {}
+        - name: test-results
+          emptyDir: {}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: audio-router-service
+  labels:
+    app: audio-router
+spec:
+  type: ClusterIP
+  ports:
+    - name: http-status
+      port: 9090
+      targetPort: 9090
+      protocol: TCP
+    - name: usrp-1
+      port: 32001
+      targetPort: 32001
+      protocol: UDP
+    - name: usrp-2
+      port: 32002
+      targetPort: 32002
+      protocol: UDP
+    - name: whotalkie-1
+      port: 32003
+      targetPort: 32003
+      protocol: UDP
+    - name: whotalkie-2
+      port: 32004
+      targetPort: 32004
+      protocol: UDP
+    - name: discord
+      port: 32005
+      targetPort: 32005
+      protocol: TCP
+  selector:
+    app: audio-router
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: audio-router-config
+  labels:
+    app: audio-router
+data:
+  audio-router-dev.json: |
+    {
+      "router": {
+        "name": "Tilt Development Audio Router Hub",
+        "description": "Live development environment with hot reload",
+        "listen_addr": "0.0.0.0",
+        "status_port": 9090
+      },
+      "audio": {
+        "buffer_size": 1000,
+        "processing_delay": 5,
+        "max_concurrent_tx": 10,
+        "tx_timeout_seconds": 30,
+        "enable_conversion": true,
+        "default_format": "opus"
+      },
+      "routing": {
+        "prevent_loops": true,
+        "enable_priority_rules": true,
+        "default_routing": "all-to-all",
+        "blocked_pairs": []
+      },
+      "amateur": {
+        "station_call": "W1DEV",
+        "default_talk_group": 1,
+        "require_valid_call": false,
+        "log_transmissions": true
+      },
+      "services": [
+        {
+          "id": "allstar_dev_1",
+          "type": "usrp",
+          "name": "AllStar Dev Node 1 (440Hz)",
+          "description": "Development AllStarLink node with 440Hz test tone",
+          "enabled": true,
+          "network": {
+            "protocol": "udp",
+            "listen_addr": "0.0.0.0",
+            "listen_port": 32001,
+            "remote_addr": "allstar-mock-1-service",
+            "remote_port": 34001
+          },
+          "audio": {
+            "format": "pcm",
+            "sample_rate": 8000,
+            "channels": 1
+          },
+          "routing": {
+            "can_send": true,
+            "can_receive": true,
+            "send_to_types": ["whotalkie", "discord"],
+            "receive_from": ["whotalkie", "discord"],
+            "priority": 5
+          }
+        },
+        {
+          "id": "allstar_dev_2",
+          "type": "usrp",
+          "name": "AllStar Dev Node 2 (1kHz)",
+          "description": "Development AllStarLink node with 1kHz test tone",
+          "enabled": true,
+          "network": {
+            "protocol": "udp",
+            "listen_addr": "0.0.0.0",
+            "listen_port": 32002,
+            "remote_addr": "allstar-mock-2-service",
+            "remote_port": 34002
+          },
+          "audio": {
+            "format": "pcm",
+            "sample_rate": 8000,
+            "channels": 1
+          },
+          "routing": {
+            "can_send": true,
+            "can_receive": true,
+            "send_to_types": ["whotalkie"],
+            "receive_from": ["whotalkie"],
+            "priority": 4
+          }
+        },
+        {
+          "id": "whotalkie_dev_1",
+          "type": "whotalkie",
+          "name": "WhoTalkie Dev Primary",
+          "description": "Development WhoTalkie service",
+          "enabled": true,
+          "network": {
+            "protocol": "udp",
+            "listen_addr": "0.0.0.0",
+            "listen_port": 32003,
+            "remote_addr": "whotalkie-mock-1-service",
+            "remote_port": 8080
+          },
+          "audio": {
+            "format": "opus",
+            "sample_rate": 48000,
+            "channels": 1,
+            "bitrate": 64000
+          },
+          "routing": {
+            "can_send": true,
+            "can_receive": true,
+            "send_to_types": ["usrp", "discord"],
+            "receive_from": ["usrp", "discord"],
+            "priority": 3
+          }
+        },
+        {
+          "id": "discord_dev",
+          "type": "discord",
+          "name": "Discord Dev Bot",
+          "description": "Development Discord voice gateway",
+          "enabled": true,
+          "network": {
+            "protocol": "tcp",
+            "listen_addr": "0.0.0.0",
+            "listen_port": 32005,
+            "remote_addr": "discord-mock-service",
+            "remote_port": 8082
+          },
+          "audio": {
+            "format": "pcm",
+            "sample_rate": 48000,
+            "channels": 2
+          },
+          "settings": {
+            "bot_token": "DEV_BOT_TOKEN",
+            "guild_id": "123456789",
+            "channel_id": "987654321",
+            "callsign": "W1DEV"
+          },
+          "routing": {
+            "can_send": true,
+            "can_receive": true,
+            "send_to_types": ["usrp", "whotalkie"],
+            "receive_from": ["usrp", "whotalkie"],
+            "priority": 3
+          }
+        }
+      ]
+    }

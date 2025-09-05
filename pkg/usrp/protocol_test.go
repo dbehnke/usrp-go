@@ -10,7 +10,7 @@ func TestVoiceMessage_MarshalUnmarshal(t *testing.T) {
 	}
 	original.Header.SetPTT(true)
 	original.Header.TalkGroup = 5678
-	
+
 	// Fill audio data with test pattern
 	for i := range original.AudioData {
 		original.AudioData[i] = int16(i % 32767)
@@ -159,7 +159,7 @@ func TestTLVMessage_MarshalUnmarshal(t *testing.T) {
 	original := &TLVMessage{
 		Header: NewHeader(USRP_TYPE_TLV, 1111),
 	}
-	
+
 	// Add some TLV items
 	original.SetCallsign("W1AW")
 	original.AddTLV(TLV_TAG_AMBE, []byte{0x01, 0x02, 0x03})
@@ -205,7 +205,7 @@ func TestVoiceULawMessage_MarshalUnmarshal(t *testing.T) {
 	original := &VoiceULawMessage{
 		Header: NewHeader(USRP_TYPE_VOICE_ULAW, 2222),
 	}
-	
+
 	// Fill with μ-law test pattern
 	for i := range original.AudioData {
 		original.AudioData[i] = byte(i % 256)
@@ -317,32 +317,32 @@ func TestMessageValidation(t *testing.T) {
 
 func TestHeaderOperations(t *testing.T) {
 	h := NewHeader(USRP_TYPE_VOICE, 42)
-	
+
 	// Test magic string
 	if string(h.Eye[:]) != USRPMagic {
 		t.Errorf("Magic mismatch: got %s, want %s", string(h.Eye[:]), USRPMagic)
 	}
-	
+
 	// Test sequence
 	if h.Seq != 42 {
 		t.Errorf("Sequence mismatch: got %d, want 42", h.Seq)
 	}
-	
+
 	// Test packet type
 	if PacketType(h.Type) != USRP_TYPE_VOICE {
 		t.Errorf("Type mismatch: got %d, want %d", h.Type, USRP_TYPE_VOICE)
 	}
-	
+
 	// Test PTT operations
 	if h.IsPTT() {
 		t.Error("PTT should initially be false")
 	}
-	
+
 	h.SetPTT(true)
 	if !h.IsPTT() {
 		t.Error("PTT should be true after setting")
 	}
-	
+
 	h.SetPTT(false)
 	if h.IsPTT() {
 		t.Error("PTT should be false after clearing")
