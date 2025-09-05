@@ -47,7 +47,7 @@ The audio-router sits between audio sources (mocks, UDP producers, file playback
 
   Diagram
 
-  ![Audio Router architecture diagram](docs/assets/audio-router.svg "Audio Router architecture")
+  ![Audio Router architecture diagram](assets/audio-router.svg "Audio Router architecture")
 
 Configuration examples
 
