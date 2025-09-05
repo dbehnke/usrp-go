@@ -242,6 +242,9 @@ just bench
 
 # Test audio conversion (requires FFmpeg)
 just audio-test
+
+# Run integration tests via Dagger
+just dagger-test
 ```
 
 ### Example Output
@@ -344,13 +347,16 @@ usrp-go/
 │   ├── USRP_BRIDGE.md         # USRP bridge utility guide
 │   ├── DISCORD_BRIDGE.md      # Discord integration guide
 │   └── AUDIO_ROUTER.md        # Audio Router Hub setup guide
+├── ci/dagger/                 # Dagger integration testing
+│   ├── main.go                # Integration test pipeline
+│   └── dagger.json            # Dagger module configuration
 ├── test/                      # Comprehensive testing framework
 │   ├── tilt/                  # Tilt development environment
 │   │   ├── README.md          # Development environment guide
 │   │   ├── Tiltfile           # Live reload orchestration
 │   │   ├── k8s/               # Kubernetes manifests
 │   │   └── scripts/           # Integration testing scripts
-│   └── integration/           # Docker-based testing
+│   └── integration/           # Integration test resources
 └── internal/transport/        # UDP transport layer (WIP)
     └── udp.go                # Network handling
 ```
