@@ -21,8 +21,13 @@ jobs:
       - name: Run Dagger pipeline
         env:
           CI: "true"
-          # Use GitHub Actions cache for Dagger engine
+          # Use GitHub Actions cache for Dagger engine  
           DAGGER_CLOUD_TOKEN: ${{ secrets.DAGGER_CLOUD_TOKEN }}
+          PATH: "/usr/local/bin:${{ env.PATH }}"
         run: |
+          # Verify Dagger is available
+          which dagger
+          dagger version
+          # Run the tests
           dagger -m ci/dagger call test --source=.
         timeout-minutes: 15
