@@ -1,0 +1,1192 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Documentation for the usrp-go integration and services">
+      
+      
+        <meta name="author" content="dbehnke">
+      
+      
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.5.2, mkdocs-material-9.1.11">
+    
+    
+      
+        <title>📋 USRP Audio Router Hub - System Requirements - usrp-go Documentation</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.85bb2934.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.a6bdf11c.min.css">
+      
+      
+
+    
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&"object"==typeof palette.color)for(var key of Object.keys(palette.color))document.body.setAttribute("data-md-color-"+key,palette.color[key])</script>
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#usrp-audio-router-hub-system-requirements" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="usrp-go Documentation" class="md-header__button md-logo" aria-label="usrp-go Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            usrp-go Documentation
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              📋 USRP Audio Router Hub - System Requirements
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+          
+            
+            
+            
+            <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-hidden="true"  type="radio" name="__palette" id="__palette_1">
+            
+          
+        </form>
+      
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="usrp-go Documentation" class="md-nav__button md-logo" aria-label="usrp-go Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    usrp-go Documentation
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        Home
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../audio-router/" class="md-nav__link">
+        Audio Router
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#operating-system-support" class="md-nav__link">
+    🖥️ Operating System Support
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#macos-setup-recommended-colima" class="md-nav__link">
+    🍎 macOS Setup (Recommended: Colima)
+  </a>
+  
+    <nav class="md-nav" aria-label="🍎 macOS Setup (Recommended: Colima)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#why-colima-over-docker-desktop" class="md-nav__link">
+    Why Colima over Docker Desktop?
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#macos-prerequisites" class="md-nav__link">
+    macOS Prerequisites
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#colima-setup-for-usrp-development" class="md-nav__link">
+    Colima Setup for USRP Development
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#startingstopping-colima" class="md-nav__link">
+    Starting/Stopping Colima
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#macos-development-workflow" class="md-nav__link">
+    macOS Development Workflow
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#linux-setup" class="md-nav__link">
+    🐧 Linux Setup
+  </a>
+  
+    <nav class="md-nav" aria-label="🐧 Linux Setup">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ubuntudebian" class="md-nav__link">
+    Ubuntu/Debian
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#red-hatcentosfedora" class="md-nav__link">
+    Red Hat/CentOS/Fedora
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#windows-setup" class="md-nav__link">
+    🪟 Windows Setup
+  </a>
+  
+    <nav class="md-nav" aria-label="🪟 Windows Setup">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#recommended-wsl2-docker" class="md-nav__link">
+    Recommended: WSL2 + Docker
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#alternative-docker-desktop" class="md-nav__link">
+    Alternative: Docker Desktop
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#development-tools" class="md-nav__link">
+    🔧 Development Tools
+  </a>
+  
+    <nav class="md-nav" aria-label="🔧 Development Tools">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#required-tools" class="md-nav__link">
+    Required Tools
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#optional-but-recommended" class="md-nav__link">
+    Optional but Recommended
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#installation-verification" class="md-nav__link">
+    Installation Verification
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#amateur-radio-specific-requirements" class="md-nav__link">
+    📡 Amateur Radio Specific Requirements
+  </a>
+  
+    <nav class="md-nav" aria-label="📡 Amateur Radio Specific Requirements">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#audio-development" class="md-nav__link">
+    Audio Development
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#network-testing-tools" class="md-nav__link">
+    Network Testing Tools
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#protocol-analysis" class="md-nav__link">
+    Protocol Analysis
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#quick-start-verification" class="md-nav__link">
+    🚀 Quick Start Verification
+  </a>
+  
+    <nav class="md-nav" aria-label="🚀 Quick Start Verification">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#system-health-check" class="md-nav__link">
+    System Health Check
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#run-basic-tests" class="md-nav__link">
+    Run Basic Tests
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#performance-recommendations" class="md-nav__link">
+    ⚡ Performance Recommendations
+  </a>
+  
+    <nav class="md-nav" aria-label="⚡ Performance Recommendations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#macos-with-colima" class="md-nav__link">
+    macOS with Colima
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#resource-requirements-by-use-case" class="md-nav__link">
+    Resource Requirements by Use Case
+  </a>
+  
+    <nav class="md-nav" aria-label="Resource Requirements by Use Case">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#minimum-basic-development" class="md-nav__link">
+    Minimum (Basic Development)
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#recommended-full-development" class="md-nav__link">
+    Recommended (Full Development)
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#optimal-heavy-development" class="md-nav__link">
+    Optimal (Heavy Development)
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    🔍 Troubleshooting
+  </a>
+  
+    <nav class="md-nav" aria-label="🔍 Troubleshooting">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#common-macos-issues" class="md-nav__link">
+    Common macOS Issues
+  </a>
+  
+    <nav class="md-nav" aria-label="Common macOS Issues">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#colima-wont-start" class="md-nav__link">
+    Colima Won't Start
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#kubernetes-not-working" class="md-nav__link">
+    Kubernetes Not Working
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#port-forwarding-issues" class="md-nav__link">
+    Port Forwarding Issues
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#common-linux-issues" class="md-nav__link">
+    Common Linux Issues
+  </a>
+  
+    <nav class="md-nav" aria-label="Common Linux Issues">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#docker-permission-denied" class="md-nav__link">
+    Docker Permission Denied
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#kind-cluster-issues" class="md-nav__link">
+    Kind Cluster Issues
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#getting-help" class="md-nav__link">
+    Getting Help
+  </a>
+  
+    <nav class="md-nav" aria-label="Getting Help">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#check-system-status" class="md-nav__link">
+    Check System Status
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#useful-debug-commands" class="md-nav__link">
+    Useful Debug Commands
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#additional-resources" class="md-nav__link">
+    📚 Additional Resources
+  </a>
+  
+    <nav class="md-nav" aria-label="📚 Additional Resources">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#official-documentation" class="md-nav__link">
+    Official Documentation
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#amateur-radio-resources" class="md-nav__link">
+    Amateur Radio Resources
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#development-resources" class="md-nav__link">
+    Development Resources
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#platform-specific-quick-start" class="md-nav__link">
+    🎯 Platform-Specific Quick Start
+  </a>
+  
+    <nav class="md-nav" aria-label="🎯 Platform-Specific Quick Start">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#macos-with-colima-recommended" class="md-nav__link">
+    macOS with Colima (Recommended)
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#linux-with-docker-kind" class="md-nav__link">
+    Linux with Docker + kind
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#windows-with-wsl2" class="md-nav__link">
+    Windows with WSL2
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+<h1 id="usrp-audio-router-hub-system-requirements">📋 USRP Audio Router Hub - System Requirements</h1>
+<p>Complete system requirements and setup instructions for developing and running the USRP Audio Router Hub platform.</p>
+<h2 id="operating-system-support">🖥️ Operating System Support</h2>
+<table>
+<thead>
+<tr>
+<th>OS</th>
+<th>Status</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>macOS</strong></td>
+<td>✅ Recommended</td>
+<td>Best development experience with Colima</td>
+</tr>
+<tr>
+<td><strong>Linux</strong></td>
+<td>✅ Fully Supported</td>
+<td>Native Docker support</td>
+</tr>
+<tr>
+<td><strong>Windows</strong></td>
+<td>✅ Supported</td>
+<td>WSL2 recommended for best experience</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="macos-setup-recommended-colima">🍎 macOS Setup (Recommended: Colima)</h2>
+<h3 id="why-colima-over-docker-desktop"><strong>Why Colima over Docker Desktop?</strong></h3>
+<ul>
+<li><strong>🆓 Free and Open Source</strong>: No licensing restrictions</li>
+<li><strong>⚡ Lightweight</strong>: Lower resource usage than Docker Desktop</li>
+<li><strong>🔧 Developer Friendly</strong>: Better integration with development tools</li>
+<li><strong>🚀 Fast</strong>: Optimized performance for macOS</li>
+<li><strong>💾 Disk Efficient</strong>: More efficient disk usage</li>
+</ul>
+<h3 id="macos-prerequisites"><strong>macOS Prerequisites</strong></h3>
+<pre><code class="language-bash"># Install Homebrew (if not already installed)
+/bin/bash -c &quot;$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)&quot;
+
+# Install required tools
+brew install git go colima docker kubectl tilt just
+</code></pre>
+<h3 id="colima-setup-for-usrp-development"><strong>Colima Setup for USRP Development</strong></h3>
+<pre><code class="language-bash"># Start Colima with optimized settings for our audio platform
+colima start --cpu 4 --memory 8 --disk 60 --kubernetes
+
+# Verify installation
+docker version
+kubectl cluster-info
+colima status
+</code></pre>
+<p><strong>Recommended Colima Configuration:</strong></p>
+<pre><code class="language-bash"># ~/.colima/default/colima.yaml (auto-created after first start)
+# Optimized for USRP Audio Router Hub development
+
+cpu: 4                    # 4 CPU cores for multi-service testing
+memory: 8                 # 8GB RAM for all services + monitoring
+disk: 60                  # 60GB disk for images and data
+
+# Kubernetes enabled for Tilt development
+kubernetes:
+  enabled: true
+  version: v1.28.4
+
+# Port forwarding for development
+network:
+  address: true           # Enable VM IP access
+
+# Volume mounts for development
+mounts:
+  - location: ~/development
+    writable: true
+</code></pre>
+<h3 id="startingstopping-colima"><strong>Starting/Stopping Colima</strong></h3>
+<pre><code class="language-bash"># Start Colima (do this before development)
+colima start
+
+# Stop Colima (when done for the day)
+colima stop
+
+# Restart Colima (if issues arise)
+colima restart
+
+# Check status
+colima status
+</code></pre>
+<h3 id="macos-development-workflow"><strong>macOS Development Workflow</strong></h3>
+<pre><code class="language-bash"># 1. Start Colima
+colima start
+
+# 2. Start USRP development environment
+cd /path/to/usrp-go
+make tilt-up
+
+# 3. Open Tilt dashboard
+make tilt-dashboard
+
+# 4. Develop with live reload!
+# Edit code → Tilt rebuilds → Services restart automatically
+
+# 5. When done, stop services and Colima
+make tilt-down
+colima stop
+</code></pre>
+<hr />
+<h2 id="linux-setup">🐧 Linux Setup</h2>
+<h3 id="ubuntudebian"><strong>Ubuntu/Debian</strong></h3>
+<pre><code class="language-bash"># Update system
+sudo apt update &amp;&amp; sudo apt upgrade -y
+
+# Install Docker
+curl -fsSL https://get.docker.com -o get-docker.sh
+sudo sh get-docker.sh
+sudo usermod -aG docker $USER
+
+# Install kubectl
+curl -LO &quot;https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl&quot;
+sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+
+# Install kind (for local Kubernetes)
+go install sigs.k8s.io/kind@latest
+
+# Install Tilt
+curl -fsSL https://raw.githubusercontent.com/tilt-dev/tilt/master/scripts/install.sh | bash
+
+# Start kind cluster
+kind create cluster --name usrp-dev
+</code></pre>
+<h3 id="red-hatcentosfedora"><strong>Red Hat/CentOS/Fedora</strong></h3>
+<pre><code class="language-bash"># Install Docker
+sudo dnf install -y docker
+sudo systemctl enable --now docker
+sudo usermod -aG docker $USER
+
+# Install kubectl, kind, and tilt (same as Ubuntu)
+# Follow Ubuntu instructions above
+</code></pre>
+<hr />
+<h2 id="windows-setup">🪟 Windows Setup</h2>
+<h3 id="recommended-wsl2-docker"><strong>Recommended: WSL2 + Docker</strong></h3>
+<pre><code class="language-powershell"># Install WSL2
+wsl --install
+
+# Inside WSL2 Ubuntu, follow Linux setup instructions
+# Then access from Windows with excellent performance
+</code></pre>
+<h3 id="alternative-docker-desktop"><strong>Alternative: Docker Desktop</strong></h3>
+<pre><code class="language-powershell"># Install Docker Desktop for Windows
+# Enable Kubernetes in Docker Desktop settings
+# Install Tilt for Windows
+</code></pre>
+<hr />
+<h2 id="development-tools">🔧 Development Tools</h2>
+<h3 id="required-tools"><strong>Required Tools</strong></h3>
+<table>
+<thead>
+<tr>
+<th>Tool</th>
+<th>Version</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Go</strong></td>
+<td>1.25+</td>
+<td>Core development language</td>
+</tr>
+<tr>
+<td><strong>Docker</strong></td>
+<td>24.0+</td>
+<td>Container runtime</td>
+</tr>
+<tr>
+<td><strong>kubectl</strong></td>
+<td>1.28+</td>
+<td>Kubernetes management</td>
+</tr>
+<tr>
+<td><strong>Tilt</strong></td>
+<td>0.33+</td>
+<td>Development environment orchestration</td>
+</tr>
+<tr>
+<td><strong>just</strong></td>
+<td>1.15+</td>
+<td>Modern command runner (replaces make)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="optional-but-recommended"><strong>Optional but Recommended</strong></h3>
+<table>
+<thead>
+<tr>
+<th>Tool</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>FFmpeg</strong></td>
+<td>Audio format conversion testing</td>
+</tr>
+<tr>
+<td><strong>tcpdump</strong></td>
+<td>Network packet analysis</td>
+</tr>
+<tr>
+<td><strong>netcat</strong></td>
+<td>Network connectivity testing</td>
+</tr>
+<tr>
+<td><strong>jq</strong></td>
+<td>JSON processing for API responses</td>
+</tr>
+<tr>
+<td><strong>curl</strong></td>
+<td>HTTP API testing</td>
+</tr>
+</tbody>
+</table>
+<h3 id="installation-verification"><strong>Installation Verification</strong></h3>
+<pre><code class="language-bash"># Verify all tools are properly installed
+go version          # Should show Go 1.25+
+docker version      # Should show Docker client/server
+kubectl version     # Should show client/server versions  
+tilt version        # Should show Tilt version
+</code></pre>
+<hr />
+<h2 id="amateur-radio-specific-requirements">📡 Amateur Radio Specific Requirements</h2>
+<h3 id="audio-development"><strong>Audio Development</strong></h3>
+<p>For audio format conversion and analysis:</p>
+<pre><code class="language-bash"># macOS
+brew install ffmpeg sox
+
+# Ubuntu/Debian  
+sudo apt install ffmpeg sox
+
+# Red Hat/CentOS/Fedora
+sudo dnf install ffmpeg sox
+</code></pre>
+<h3 id="network-testing-tools"><strong>Network Testing Tools</strong></h3>
+<p>For amateur radio protocol testing:</p>
+<pre><code class="language-bash"># macOS
+brew install tcpdump netcat wireshark
+
+# Linux
+sudo apt install tcpdump netcat wireshark  # Ubuntu/Debian
+sudo dnf install tcpdump netcat wireshark  # Red Hat/CentOS/Fedora
+</code></pre>
+<h3 id="protocol-analysis"><strong>Protocol Analysis</strong></h3>
+<p>For USRP packet inspection:</p>
+<pre><code class="language-bash"># Wireshark with custom dissectors (optional)
+# Useful for detailed USRP packet analysis
+</code></pre>
+<hr />
+<h2 id="quick-start-verification">🚀 Quick Start Verification</h2>
+<h3 id="system-health-check"><strong>System Health Check</strong></h3>
+<pre><code class="language-bash"># Clone the repository
+git clone https://github.com/dbehnke/usrp-go.git
+cd usrp-go
+
+# Verify Go build works
+go build ./cmd/audio-router/
+
+# Verify Docker works
+docker run hello-world
+
+# Verify Kubernetes works (Colima/kind/Docker Desktop)
+kubectl cluster-info
+
+# Verify Tilt works
+tilt version
+</code></pre>
+<h3 id="run-basic-tests"><strong>Run Basic Tests</strong></h3>
+<pre><code class="language-bash"># Run unit tests
+just test
+
+# Test basic functionality
+just run-example
+
+# Test audio router config generation
+just router-config
+
+# Start development environment (requires Kubernetes)
+just dev
+</code></pre>
+<hr />
+<h2 id="performance-recommendations">⚡ Performance Recommendations</h2>
+<h3 id="macos-with-colima"><strong>macOS with Colima</strong></h3>
+<pre><code class="language-bash"># Optimal Colima settings for USRP development
+colima start \
+  --cpu 4 \
+  --memory 8 \
+  --disk 60 \
+  --kubernetes \
+  --network-address
+</code></pre>
+<h3 id="resource-requirements-by-use-case"><strong>Resource Requirements by Use Case</strong></h3>
+<h4 id="minimum-basic-development"><strong>Minimum (Basic Development)</strong></h4>
+<ul>
+<li><strong>CPU</strong>: 2 cores</li>
+<li><strong>RAM</strong>: 4GB</li>
+<li><strong>Disk</strong>: 20GB</li>
+<li><strong>Services</strong>: Audio Router + 1 mock service</li>
+</ul>
+<h4 id="recommended-full-development"><strong>Recommended (Full Development)</strong></h4>
+<ul>
+<li><strong>CPU</strong>: 4 cores</li>
+<li><strong>RAM</strong>: 8GB</li>
+<li><strong>Disk</strong>: 60GB</li>
+<li><strong>Services</strong>: Audio Router + All mock services + Monitoring</li>
+</ul>
+<h4 id="optimal-heavy-development"><strong>Optimal (Heavy Development)</strong></h4>
+<ul>
+<li><strong>CPU</strong>: 8 cores</li>
+<li><strong>RAM</strong>: 16GB</li>
+<li><strong>Disk</strong>: 100GB</li>
+<li><strong>Services</strong>: Multiple router instances + Load testing</li>
+</ul>
+<hr />
+<h2 id="troubleshooting">🔍 Troubleshooting</h2>
+<h3 id="common-macos-issues"><strong>Common macOS Issues</strong></h3>
+<h4 id="colima-wont-start"><strong>Colima Won't Start</strong></h4>
+<pre><code class="language-bash"># Check if Docker Desktop is running (conflicts with Colima)
+docker context ls
+# Should show &quot;colima&quot; as current context
+
+# If Docker Desktop is active:
+docker context use colima
+
+# Reset Colima if needed
+colima delete
+colima start --cpu 4 --memory 8 --kubernetes
+</code></pre>
+<h4 id="kubernetes-not-working"><strong>Kubernetes Not Working</strong></h4>
+<pre><code class="language-bash"># Verify Kubernetes is enabled in Colima
+colima status
+
+# If not enabled:
+colima stop
+colima start --kubernetes
+
+# Verify kubectl context
+kubectl config current-context  # Should show &quot;colima&quot;
+</code></pre>
+<h4 id="port-forwarding-issues"><strong>Port Forwarding Issues</strong></h4>
+<pre><code class="language-bash"># Check if ports are already in use
+lsof -i :9090
+lsof -i :10350
+
+# Kill conflicting processes if needed
+sudo lsof -ti :9090 | xargs kill -9
+</code></pre>
+<h3 id="common-linux-issues"><strong>Common Linux Issues</strong></h3>
+<h4 id="docker-permission-denied"><strong>Docker Permission Denied</strong></h4>
+<pre><code class="language-bash"># Ensure user is in docker group
+sudo usermod -aG docker $USER
+# Log out and log back in
+
+# Or use sudo temporarily
+sudo docker version
+</code></pre>
+<h4 id="kind-cluster-issues"><strong>Kind Cluster Issues</strong></h4>
+<pre><code class="language-bash"># Delete and recreate kind cluster
+kind delete cluster --name usrp-dev
+kind create cluster --name usrp-dev
+
+# Verify cluster is running
+kubectl cluster-info --context kind-usrp-dev
+</code></pre>
+<h3 id="getting-help"><strong>Getting Help</strong></h3>
+<h4 id="check-system-status"><strong>Check System Status</strong></h4>
+<pre><code class="language-bash"># Comprehensive system check
+./scripts/system-check.sh  # (if created)
+
+# Or manual checks:
+colima status              # macOS
+docker version
+kubectl cluster-info  
+tilt doctor               # Diagnose Tilt issues
+</code></pre>
+<h4 id="useful-debug-commands"><strong>Useful Debug Commands</strong></h4>
+<pre><code class="language-bash"># Docker debugging
+docker system info
+docker system df
+
+# Kubernetes debugging
+kubectl get nodes
+kubectl get pods --all-namespaces
+
+# Tilt debugging  
+tilt doctor
+tilt logs --follow
+</code></pre>
+<hr />
+<h2 id="additional-resources">📚 Additional Resources</h2>
+<h3 id="official-documentation"><strong>Official Documentation</strong></h3>
+<ul>
+<li><strong><a href="https://github.com/abiosoft/colima">Colima GitHub</a></strong>: Official Colima documentation</li>
+<li><strong><a href="https://docs.tilt.dev/">Tilt Documentation</a></strong>: Complete Tilt development guide</li>
+<li><strong><a href="https://kubernetes.io/docs/reference/kubectl/">kubectl Reference</a></strong>: Kubernetes command reference</li>
+</ul>
+<h3 id="amateur-radio-resources"><strong>Amateur Radio Resources</strong></h3>
+<ul>
+<li><strong><a href="https://wiki.allstarlink.org/">AllStarLink Wiki</a></strong>: AllStarLink documentation</li>
+<li><strong><a href="https://github.com/dl1hrc/svxlink/blob/svxlink-usrp/src/svxlink/svxlink/contrib/UsrpLogic/usrp_protocol.txt">USRP Protocol Spec</a></strong>: Official USRP protocol documentation</li>
+</ul>
+<h3 id="development-resources"><strong>Development Resources</strong></h3>
+<ul>
+<li><strong><a href="https://golang.org/doc/">Go Documentation</a></strong>: Official Go language documentation  </li>
+<li><strong><a href="https://docs.docker.com/develop/best-practices/">Docker Best Practices</a></strong>: Container development guidelines</li>
+</ul>
+<hr />
+<h2 id="platform-specific-quick-start">🎯 Platform-Specific Quick Start</h2>
+<h3 id="macos-with-colima-recommended"><strong>macOS with Colima (Recommended)</strong></h3>
+<pre><code class="language-bash"># One-time setup
+brew install colima docker kubectl tilt
+colima start --cpu 4 --memory 8 --kubernetes
+
+# Daily development workflow
+cd usrp-go
+just dev               # Start development environment (Tilt)
+just tilt-dashboard    # Open Tilt UI
+# ... develop with live reload ...
+just tilt-down         # Stop when done
+colima stop           # Stop Colima to save resources
+</code></pre>
+<h3 id="linux-with-docker-kind"><strong>Linux with Docker + kind</strong></h3>
+<pre><code class="language-bash"># One-time setup  
+# [Install Docker, kubectl, kind, tilt as shown above]
+kind create cluster --name usrp-dev
+
+# Daily development workflow
+cd usrp-go
+just dev               # Start development environment  
+just tilt-dashboard    # Open Tilt UI
+# ... develop with live reload ...
+just tilt-down         # Stop when done
+</code></pre>
+<h3 id="windows-with-wsl2"><strong>Windows with WSL2</strong></h3>
+<pre><code class="language-bash"># Run in WSL2 Ubuntu environment
+# Follow Linux setup instructions
+# Access from Windows browser: http://localhost:10350
+</code></pre>
+<hr />
+<p><strong>🎉 With these requirements met, you'll have an excellent development experience for the USRP Audio Router Hub platform! The combination of Colima (on macOS) + Tilt provides a lightweight, fast, and professional development environment perfect for amateur radio software development.</strong></p>
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    <script id="__config" type="application/json">{"base": "..", "features": [], "search": "../assets/javascripts/workers/search.208ed371.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.fac441b0.min.js"></script>
+      
+    
+  </body>
+</html>

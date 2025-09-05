@@ -1,0 +1,1190 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Documentation for the usrp-go integration and services">
+      
+      
+        <meta name="author" content="dbehnke">
+      
+      
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.5.2, mkdocs-material-9.1.11">
+    
+    
+      
+        <title>USRP Bridge Utility - usrp-go Documentation</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.85bb2934.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.a6bdf11c.min.css">
+      
+      
+
+    
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&"object"==typeof palette.color)for(var key of Object.keys(palette.color))document.body.setAttribute("data-md-color-"+key,palette.color[key])</script>
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#usrp-bridge-utility" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="usrp-go Documentation" class="md-header__button md-logo" aria-label="usrp-go Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            usrp-go Documentation
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              USRP Bridge Utility
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+          
+            
+            
+            
+            <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-hidden="true"  type="radio" name="__palette" id="__palette_1">
+            
+          
+        </form>
+      
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="usrp-go Documentation" class="md-nav__button md-logo" aria-label="usrp-go Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    usrp-go Documentation
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        Home
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../audio-router/" class="md-nav__link">
+        Audio Router
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#architecture" class="md-nav__link">
+    Architecture
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#key-features" class="md-nav__link">
+    Key Features
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#installation" class="md-nav__link">
+    Installation
+  </a>
+  
+    <nav class="md-nav" aria-label="Installation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#requirements" class="md-nav__link">
+    Requirements
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#building" class="md-nav__link">
+    Building
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ffmpeg-installation" class="md-nav__link">
+    FFmpeg Installation
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#quick-start" class="md-nav__link">
+    Quick Start
+  </a>
+  
+    <nav class="md-nav" aria-label="Quick Start">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#simple-usage-command-line" class="md-nav__link">
+    Simple Usage (Command Line)
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#configuration-file-usage" class="md-nav__link">
+    Configuration File Usage
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configuration" class="md-nav__link">
+    Configuration
+  </a>
+  
+    <nav class="md-nav" aria-label="Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#configuration-file-format" class="md-nav__link">
+    Configuration File Format
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#configuration-parameters" class="md-nav__link">
+    Configuration Parameters
+  </a>
+  
+    <nav class="md-nav" aria-label="Configuration Parameters">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#network-settings" class="md-nav__link">
+    Network Settings
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#destination-services" class="md-nav__link">
+    Destination Services
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#audio-processing" class="md-nav__link">
+    Audio Processing
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#amateur-radio-settings" class="md-nav__link">
+    Amateur Radio Settings
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#usage-examples" class="md-nav__link">
+    Usage Examples
+  </a>
+  
+    <nav class="md-nav" aria-label="Usage Examples">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#whotalkie-integration" class="md-nav__link">
+    WhoTalkie Integration
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#multi-destination-setup" class="md-nav__link">
+    Multi-Destination Setup
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#high-quality-audio-setup" class="md-nav__link">
+    High-Quality Audio Setup
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#allstarlink-integration" class="md-nav__link">
+    AllStarLink Integration
+  </a>
+  
+    <nav class="md-nav" aria-label="AllStarLink Integration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#node-configuration" class="md-nav__link">
+    Node Configuration
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#network-setup" class="md-nav__link">
+    Network Setup
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#monitoring-and-statistics" class="md-nav__link">
+    Monitoring and Statistics
+  </a>
+  
+    <nav class="md-nav" aria-label="Monitoring and Statistics">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#real-time-statistics" class="md-nav__link">
+    Real-time Statistics
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#statistics-output" class="md-nav__link">
+    Statistics Output
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#performance-monitoring" class="md-nav__link">
+    Performance Monitoring
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#service-integration" class="md-nav__link">
+    Service Integration
+  </a>
+  
+    <nav class="md-nav" aria-label="Service Integration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#whotalkie-protocol" class="md-nav__link">
+    WhoTalkie Protocol
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#discord-integration" class="md-nav__link">
+    Discord Integration
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#generic-services" class="md-nav__link">
+    Generic Services
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    Troubleshooting
+  </a>
+  
+    <nav class="md-nav" aria-label="Troubleshooting">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#common-issues" class="md-nav__link">
+    Common Issues
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#performance-issues" class="md-nav__link">
+    Performance Issues
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#security-considerations" class="md-nav__link">
+    Security Considerations
+  </a>
+  
+    <nav class="md-nav" aria-label="Security Considerations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#network-security" class="md-nav__link">
+    Network Security
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#amateur-radio-compliance" class="md-nav__link">
+    Amateur Radio Compliance
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#development-and-customization" class="md-nav__link">
+    Development and Customization
+  </a>
+  
+    <nav class="md-nav" aria-label="Development and Customization">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#custom-destination-types" class="md-nav__link">
+    Custom Destination Types
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#extending-configuration" class="md-nav__link">
+    Extending Configuration
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#plugin-architecture" class="md-nav__link">
+    Plugin Architecture
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#production-deployment" class="md-nav__link">
+    Production Deployment
+  </a>
+  
+    <nav class="md-nav" aria-label="Production Deployment">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#systemd-service" class="md-nav__link">
+    Systemd Service
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#docker-deployment" class="md-nav__link">
+    Docker Deployment
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#high-availability" class="md-nav__link">
+    High Availability
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#legal-and-regulatory" class="md-nav__link">
+    Legal and Regulatory
+  </a>
+  
+    <nav class="md-nav" aria-label="Legal and Regulatory">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#amateur-radio-compliance_1" class="md-nav__link">
+    Amateur Radio Compliance
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#international-considerations" class="md-nav__link">
+    International Considerations
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#contributing" class="md-nav__link">
+    Contributing
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#license" class="md-nav__link">
+    License
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#references" class="md-nav__link">
+    References
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+<h1 id="usrp-bridge-utility">USRP Bridge Utility</h1>
+<p>The USRP Bridge is a powerful utility that connects AllStarLink nodes with modern destination services through FFmpeg Opus conversion. It acts as a transparent bridge, converting amateur radio USRP packets to compressed audio formats for internet transmission.</p>
+<h2 id="architecture">Architecture</h2>
+<pre><code>AllStarLink Node &lt;--USRP--&gt; USRP Bridge &lt;--Opus/Ogg--&gt; Destination Service
+                             │                          │
+                             ├── WhoTalkie              │
+                             ├── Discord Bot            │
+                             └── Custom Services        │
+</code></pre>
+<p>The bridge receives USRP packets from AllStarLink nodes, converts the audio to Opus/Ogg format using FFmpeg, and forwards the compressed audio to configured destination services while maintaining full amateur radio protocol compliance.</p>
+<h2 id="key-features">Key Features</h2>
+<p>✅ <strong>Multi-Destination Support</strong>: Forward audio to multiple services simultaneously<br />
+✅ <strong>FFmpeg Integration</strong>: High-quality Opus/Ogg audio conversion<br />
+✅ <strong>AllStarLink Compatible</strong>: Full USRP protocol compliance<br />
+✅ <strong>Configurable Routing</strong>: JSON-based configuration for complex setups<br />
+✅ <strong>Real-time Monitoring</strong>: Built-in statistics and performance metrics<br />
+✅ <strong>Amateur Radio Compliant</strong>: Proper callsign handling and PTT control<br />
+✅ <strong>Production Ready</strong>: Robust error handling and graceful degradation  </p>
+<h2 id="installation">Installation</h2>
+<h3 id="requirements">Requirements</h3>
+<ul>
+<li><strong>Go 1.19+</strong> for building the bridge</li>
+<li><strong>FFmpeg with libopus</strong> for audio conversion</li>
+<li><strong>AllStarLink node</strong> or USRP-compatible system</li>
+<li><strong>Amateur radio license</strong> for legal operation</li>
+</ul>
+<h3 id="building">Building</h3>
+<pre><code class="language-bash"># Build the USRP bridge binary
+make build-usrp-bridge
+
+# Or build manually
+go build -o bin/usrp-bridge cmd/usrp-bridge/main.go
+</code></pre>
+<h3 id="ffmpeg-installation">FFmpeg Installation</h3>
+<pre><code class="language-bash"># macOS (Homebrew)
+brew install ffmpeg
+
+# Ubuntu/Debian  
+sudo apt install ffmpeg libopus-dev
+
+# CentOS/RHEL
+sudo yum install ffmpeg opus-devel
+
+# Verify Opus support
+ffmpeg -encoders | grep opus
+</code></pre>
+<h2 id="quick-start">Quick Start</h2>
+<h3 id="simple-usage-command-line">Simple Usage (Command Line)</h3>
+<pre><code class="language-bash"># Run with default settings (listen on :12345, forward to 127.0.0.1:8080)
+./bin/usrp-bridge
+
+# Specify custom ports and destination
+./bin/usrp-bridge -listen-port 12345 -dest-host 192.168.1.100 -dest-port 8080 -callsign W1AW
+
+# Enable verbose logging
+./bin/usrp-bridge -verbose -callsign KC1ABC
+</code></pre>
+<h3 id="configuration-file-usage">Configuration File Usage</h3>
+<pre><code class="language-bash"># Generate sample configuration
+make run-usrp-bridge-config
+# or: ./bin/usrp-bridge -generate-config
+
+# Edit the generated usrp-bridge.json file
+vim usrp-bridge.json
+
+# Run with configuration file
+./bin/usrp-bridge -config usrp-bridge.json
+</code></pre>
+<h2 id="configuration">Configuration</h2>
+<h3 id="configuration-file-format">Configuration File Format</h3>
+<pre><code class="language-json">{
+  &quot;usrp_listen_port&quot;: 12345,
+  &quot;usrp_listen_addr&quot;: &quot;0.0.0.0&quot;,
+  &quot;allstar_host&quot;: &quot;127.0.0.1&quot;,
+  &quot;allstar_port&quot;: 12346,
+  &quot;destinations&quot;: [
+    {
+      &quot;name&quot;: &quot;whotalkie&quot;,
+      &quot;type&quot;: &quot;whotalkie&quot;,
+      &quot;host&quot;: &quot;127.0.0.1&quot;,
+      &quot;port&quot;: 8080,
+      &quot;protocol&quot;: &quot;udp&quot;,
+      &quot;format&quot;: &quot;opus&quot;,
+      &quot;enabled&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;discord-bot&quot;,
+      &quot;type&quot;: &quot;discord&quot;,
+      &quot;host&quot;: &quot;127.0.0.1&quot;, 
+      &quot;port&quot;: 8081,
+      &quot;protocol&quot;: &quot;udp&quot;,
+      &quot;format&quot;: &quot;opus&quot;,
+      &quot;enabled&quot;: false,
+      &quot;settings&quot;: {
+        &quot;guild_id&quot;: &quot;your_guild_id&quot;,
+        &quot;channel_id&quot;: &quot;your_channel_id&quot;
+      }
+    }
+  ],
+  &quot;audio_config&quot;: {
+    &quot;enable_conversion&quot;: true,
+    &quot;output_format&quot;: &quot;opus&quot;,
+    &quot;bitrate&quot;: 64,
+    &quot;sample_rate&quot;: 8000,
+    &quot;channels&quot;: 1
+  },
+  &quot;log_level&quot;: &quot;info&quot;,
+  &quot;metrics_port&quot;: 9090,
+  &quot;station_call&quot;: &quot;N0CALL&quot;,
+  &quot;talk_group&quot;: 0
+}
+</code></pre>
+<h3 id="configuration-parameters">Configuration Parameters</h3>
+<h4 id="network-settings">Network Settings</h4>
+<ul>
+<li><strong><code>usrp_listen_port</code></strong>: Port to listen for USRP packets (default: 12345)</li>
+<li><strong><code>usrp_listen_addr</code></strong>: Listen address (default: "0.0.0.0")</li>
+<li><strong><code>allstar_host</code></strong>: AllStarLink return address (default: "127.0.0.1")</li>
+<li><strong><code>allstar_port</code></strong>: AllStarLink return port (default: 12346)</li>
+</ul>
+<h4 id="destination-services">Destination Services</h4>
+<ul>
+<li><strong><code>name</code></strong>: Unique identifier for the destination</li>
+<li><strong><code>type</code></strong>: Service type ("whotalkie", "discord", "generic")</li>
+<li><strong><code>host</code></strong>: Destination host address</li>
+<li><strong><code>port</code></strong>: Destination port number</li>
+<li><strong><code>protocol</code></strong>: Transport protocol ("udp", "tcp", "websocket")</li>
+<li><strong><code>format</code></strong>: Audio format ("opus", "ogg", "raw")</li>
+<li><strong><code>enabled</code></strong>: Enable/disable this destination</li>
+<li><strong><code>settings</code></strong>: Service-specific configuration parameters</li>
+</ul>
+<h4 id="audio-processing">Audio Processing</h4>
+<ul>
+<li><strong><code>enable_conversion</code></strong>: Enable FFmpeg audio conversion</li>
+<li><strong><code>output_format</code></strong>: Target audio format ("opus", "ogg")</li>
+<li><strong><code>bitrate</code></strong>: Audio bitrate in kbps (default: 64)</li>
+<li><strong><code>sample_rate</code></strong>: Output sample rate in Hz (default: 8000)</li>
+<li><strong><code>channels</code></strong>: Number of audio channels (default: 1)</li>
+</ul>
+<h4 id="amateur-radio-settings">Amateur Radio Settings</h4>
+<ul>
+<li><strong><code>station_call</code></strong>: Your amateur radio callsign</li>
+<li><strong><code>talk_group</code></strong>: USRP talk group ID (default: 0)</li>
+</ul>
+<h2 id="usage-examples">Usage Examples</h2>
+<h3 id="whotalkie-integration">WhoTalkie Integration</h3>
+<p>Connect AllStarLink to WhoTalkie service:</p>
+<pre><code class="language-json">{
+  &quot;usrp_listen_port&quot;: 12345,
+  &quot;allstar_host&quot;: &quot;your-allstar-node.local&quot;,
+  &quot;allstar_port&quot;: 2001,
+  &quot;destinations&quot;: [
+    {
+      &quot;name&quot;: &quot;whotalkie-main&quot;,
+      &quot;type&quot;: &quot;whotalkie&quot;,
+      &quot;host&quot;: &quot;whotalkie.example.com&quot;,
+      &quot;port&quot;: 8080,
+      &quot;protocol&quot;: &quot;udp&quot;, 
+      &quot;format&quot;: &quot;opus&quot;,
+      &quot;enabled&quot;: true,
+      &quot;settings&quot;: {
+        &quot;room&quot;: &quot;main-room&quot;,
+        &quot;user&quot;: &quot;AllStarLink-Bridge&quot;
+      }
+    }
+  ],
+  &quot;station_call&quot;: &quot;W1AW&quot;,
+  &quot;audio_config&quot;: {
+    &quot;enable_conversion&quot;: true,
+    &quot;output_format&quot;: &quot;opus&quot;,
+    &quot;bitrate&quot;: 32
+  }
+}
+</code></pre>
+<h3 id="multi-destination-setup">Multi-Destination Setup</h3>
+<p>Forward audio to multiple services:</p>
+<pre><code class="language-json">{
+  &quot;destinations&quot;: [
+    {
+      &quot;name&quot;: &quot;whotalkie-primary&quot;,
+      &quot;type&quot;: &quot;whotalkie&quot;,
+      &quot;host&quot;: &quot;primary.whotalkie.com&quot;,
+      &quot;port&quot;: 8080,
+      &quot;enabled&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;whotalkie-backup&quot;,
+      &quot;type&quot;: &quot;whotalkie&quot;, 
+      &quot;host&quot;: &quot;backup.whotalkie.com&quot;,
+      &quot;port&quot;: 8080,
+      &quot;enabled&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;discord-emergency&quot;,
+      &quot;type&quot;: &quot;discord&quot;,
+      &quot;host&quot;: &quot;127.0.0.1&quot;,
+      &quot;port&quot;: 8081,
+      &quot;enabled&quot;: false
+    }
+  ]
+}
+</code></pre>
+<h3 id="high-quality-audio-setup">High-Quality Audio Setup</h3>
+<p>For high-quality audio applications:</p>
+<pre><code class="language-json">{
+  &quot;audio_config&quot;: {
+    &quot;enable_conversion&quot;: true,
+    &quot;output_format&quot;: &quot;ogg&quot;,
+    &quot;bitrate&quot;: 128,
+    &quot;sample_rate&quot;: 8000,
+    &quot;channels&quot;: 1
+  }
+}
+</code></pre>
+<h2 id="allstarlink-integration">AllStarLink Integration</h2>
+<h3 id="node-configuration">Node Configuration</h3>
+<p>Configure your AllStarLink node to send USRP packets to the bridge:</p>
+<pre><code class="language-ini">; In your rpt.conf
+[node-number]
+duplex = 0
+rxchannel = usrp/127.0.0.1:12345,usrp
+
+; Enable USRP transmit
+[usrp]
+; Configuration for your USRP bridge
+call = W1AW
+context = radio-bridge
+</code></pre>
+<h3 id="network-setup">Network Setup</h3>
+<pre><code class="language-bash"># AllStarLink node sends to bridge
+# Configure your node to send USRP packets to bridge IP:12345
+
+# Bridge receives USRP packets and converts to Opus
+# Bridge forwards Opus to destination services
+
+# Example network flow:
+# AllStarLink Node (192.168.1.100:2001) -&gt; Bridge (192.168.1.200:12345) -&gt; WhoTalkie (whotalkie.com:8080)
+</code></pre>
+<h2 id="monitoring-and-statistics">Monitoring and Statistics</h2>
+<h3 id="real-time-statistics">Real-time Statistics</h3>
+<pre><code class="language-bash"># Send SIGUSR1 to display statistics
+kill -USR1 $(pgrep usrp-bridge)
+
+# Or if running in foreground, press Ctrl+\ on some systems
+</code></pre>
+<h3 id="statistics-output">Statistics Output</h3>
+<pre><code>📊 Bridge Statistics
+==================
+USRP Packets: 1234 received, 1230 sent
+Opus Packets: 890 generated, 888 forwarded
+Errors: 2 conversion, 1 network
+Traffic: 445632 bytes received, 89126 bytes sent
+Last Activity: 2025-01-15T10:30:45Z
+</code></pre>
+<h3 id="performance-monitoring">Performance Monitoring</h3>
+<p>The bridge provides metrics on port 9090 (configurable):</p>
+<pre><code class="language-bash"># Check bridge health
+curl http://localhost:9090/stats
+
+# Monitor with tools like Prometheus/Grafana
+</code></pre>
+<h2 id="service-integration">Service Integration</h2>
+<h3 id="whotalkie-protocol">WhoTalkie Protocol</h3>
+<p>The bridge formats audio data for WhoTalkie compatibility:</p>
+<ul>
+<li>Opus audio at configured bitrate</li>
+<li>UDP transport protocol</li>
+<li>Metadata preservation for PTT state and callsign</li>
+</ul>
+<h3 id="discord-integration">Discord Integration</h3>
+<p>For Discord bot integration:</p>
+<pre><code class="language-json">{
+  &quot;name&quot;: &quot;discord-bot&quot;,
+  &quot;type&quot;: &quot;discord&quot;,
+  &quot;settings&quot;: {
+    &quot;guild_id&quot;: &quot;123456789012345678&quot;,
+    &quot;channel_id&quot;: &quot;987654321098765432&quot;,
+    &quot;bot_token&quot;: &quot;stored_separately&quot;
+  }
+}
+</code></pre>
+<h3 id="generic-services">Generic Services</h3>
+<p>For custom services:</p>
+<pre><code class="language-json">{
+  &quot;name&quot;: &quot;custom-service&quot;,
+  &quot;type&quot;: &quot;generic&quot;,
+  &quot;protocol&quot;: &quot;udp&quot;,
+  &quot;format&quot;: &quot;opus&quot;,
+  &quot;settings&quot;: {
+    &quot;custom_header&quot;: true,
+    &quot;packet_size&quot;: 1024
+  }
+}
+</code></pre>
+<h2 id="troubleshooting">Troubleshooting</h2>
+<h3 id="common-issues">Common Issues</h3>
+<p><strong>"Failed to create audio converter"</strong></p>
+<pre><code class="language-bash"># Check FFmpeg installation
+ffmpeg -version
+ffmpeg -encoders | grep opus
+
+# Install FFmpeg with Opus support
+brew install ffmpeg  # macOS
+sudo apt install ffmpeg libopus-dev  # Ubuntu
+</code></pre>
+<p><strong>"Failed to listen on USRP port"</strong></p>
+<pre><code class="language-bash"># Check if port is already in use
+sudo netstat -ulnp | grep :12345
+
+# Check permissions for low ports (&lt;1024)
+sudo ./usrp-bridge -listen-port 1234
+</code></pre>
+<p><strong>"Failed to connect to destination"</strong></p>
+<pre><code class="language-bash"># Test network connectivity
+nc -u destination-host 8080
+
+# Check firewall settings
+# Ensure destination service is running and accessible
+</code></pre>
+<h3 id="performance-issues">Performance Issues</h3>
+<p><strong>High CPU Usage</strong>
+- Reduce audio bitrate (64 -&gt; 32 kbps)
+- Disable unnecessary destinations
+- Check FFmpeg processes with <code>ps aux | grep ffmpeg</code></p>
+<p><strong>High Latency</strong>
+- Minimize network hops to destination services
+- Use faster network connections
+- Consider local destination services</p>
+<p><strong>Packet Loss</strong>
+- Check network quality with <code>ping</code> and <code>traceroute</code>
+- Increase buffer sizes if available
+- Monitor with <code>iftop</code> or similar tools</p>
+<h2 id="security-considerations">Security Considerations</h2>
+<h3 id="network-security">Network Security</h3>
+<ul>
+<li><strong>Firewall Configuration</strong>: Only allow necessary ports</li>
+<li><strong>Access Control</strong>: Limit source IPs for USRP packets</li>
+<li><strong>Encryption</strong>: Use VPN for internet transmission when possible</li>
+</ul>
+<h3 id="amateur-radio-compliance">Amateur Radio Compliance</h3>
+<ul>
+<li><strong>Station Identification</strong>: Ensure proper callsign in configuration</li>
+<li><strong>License Verification</strong>: Valid amateur radio license required</li>
+<li><strong>Band Plan Compliance</strong>: Use only authorized frequencies</li>
+<li><strong>Third Party Traffic</strong>: Follow local amateur radio regulations</li>
+</ul>
+<h2 id="development-and-customization">Development and Customization</h2>
+<h3 id="custom-destination-types">Custom Destination Types</h3>
+<p>Add support for new services by modifying the <code>formatFor*</code> functions:</p>
+<pre><code class="language-go">func (b *Bridge) formatForCustomService(audioData []byte, voiceMsg *usrp.VoiceMessage) []byte {
+    // Custom formatting logic
+    return formattedData
+}
+</code></pre>
+<h3 id="extending-configuration">Extending Configuration</h3>
+<p>Add new configuration parameters:</p>
+<pre><code class="language-go">type DestinationConfig struct {
+    // Existing fields...
+    CustomField string `json:&quot;custom_field,omitempty&quot;`
+}
+</code></pre>
+<h3 id="plugin-architecture">Plugin Architecture</h3>
+<p>The bridge can be extended with a plugin system for custom audio processing or destination protocols.</p>
+<h2 id="production-deployment">Production Deployment</h2>
+<h3 id="systemd-service">Systemd Service</h3>
+<pre><code class="language-ini">[Unit]
+Description=USRP Bridge Utility
+After=network.target
+Wants=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/usrp-bridge -config /etc/usrp-bridge/config.json
+Restart=always
+RestartSec=5
+User=usrp-bridge
+Group=usrp-bridge
+
+[Install]
+WantedBy=multi-user.target
+</code></pre>
+<h3 id="docker-deployment">Docker Deployment</h3>
+<pre><code class="language-dockerfile">FROM golang:1.19-alpine AS builder
+WORKDIR /app
+COPY . .
+RUN go build -o usrp-bridge cmd/usrp-bridge/main.go
+
+FROM alpine:latest
+RUN apk add --no-cache ffmpeg
+COPY --from=builder /app/usrp-bridge /usr/local/bin/
+EXPOSE 12345/udp
+CMD [&quot;usrp-bridge&quot;, &quot;-config&quot;, &quot;/etc/usrp-bridge/config.json&quot;]
+</code></pre>
+<h3 id="high-availability">High Availability</h3>
+<p>For critical applications:</p>
+<ul>
+<li>Run multiple bridge instances with different destination priorities</li>
+<li>Use load balancers for incoming USRP traffic</li>
+<li>Implement health checks and automatic failover</li>
+<li>Monitor with tools like Nagios or Zabbix</li>
+</ul>
+<h2 id="legal-and-regulatory">Legal and Regulatory</h2>
+<h3 id="amateur-radio-compliance_1">Amateur Radio Compliance</h3>
+<p>⚠️ <strong>Important Legal Requirements</strong></p>
+<ul>
+<li><strong>Valid License</strong>: Amateur radio license required for USRP operation</li>
+<li><strong>Proper Identification</strong>: Station callsign must be configured correctly</li>
+<li><strong>Band Plan Compliance</strong>: Use only authorized amateur frequencies</li>
+<li><strong>Third Party Traffic</strong>: Follow regulations for internet-linked communications</li>
+<li><strong>Power Limits</strong>: Ensure compliance with power restrictions</li>
+<li><strong>Spurious Emissions</strong>: Use proper filtering and clean signals</li>
+</ul>
+<h3 id="international-considerations">International Considerations</h3>
+<ul>
+<li>Different countries have varying amateur radio regulations</li>
+<li>Internet linking may have specific requirements</li>
+<li>Check with local amateur radio authorities</li>
+<li>Some regions restrict third-party traffic or encryption</li>
+</ul>
+<h2 id="contributing">Contributing</h2>
+<p>Contributions are welcome! Please:</p>
+<ol>
+<li>Maintain amateur radio compliance in all changes</li>
+<li>Test with real AllStarLink systems when possible</li>
+<li>Follow Go best practices and include tests</li>
+<li>Document any configuration changes</li>
+<li>Consider backward compatibility</li>
+</ol>
+<h2 id="license">License</h2>
+<p>MIT License - See LICENSE file for details.</p>
+<p>This software is provided for <strong>amateur radio experimentation</strong> under Part 97 regulations and similar international amateur radio regulations.</p>
+<hr />
+<p><strong>73, Good DX!</strong> 📻🌐</p>
+<p><em>"Bridging amateur radio to the modern internet while preserving the spirit of experimentation"</em></p>
+<h2 id="references">References</h2>
+<ul>
+<li><a href="https://wiki.allstarlink.org/">AllStarLink Documentation</a></li>
+<li><a href="https://github.com/dbehnke/whotalkie">WhoTalkie Project</a></li>
+<li><a href="https://ffmpeg.org/documentation.html">FFmpeg Documentation</a></li>
+<li><a href="https://github.com/dbehnke/usrp-go">USRP Protocol Specification</a></li>
+</ul>
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    <script id="__config" type="application/json">{"base": "..", "features": [], "search": "../assets/javascripts/workers/search.208ed371.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.fac441b0.min.js"></script>
+      
+    
+  </body>
+</html>
