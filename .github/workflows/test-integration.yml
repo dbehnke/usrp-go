@@ -16,18 +16,26 @@ jobs:
 
       - name: Install Dagger CLI
         run: |
+          echo "📦 Installing Dagger CLI..."
           curl -L https://dl.dagger.io/dagger/install.sh | sudo sh
+          echo "🔍 Checking installation..."
+          ls -la /usr/local/bin/ | grep -i dagger || echo "No dagger binary found in /usr/local/bin/"
 
       - name: Run Dagger pipeline
         env:
           CI: "true"
           # Use GitHub Actions cache for Dagger engine  
           DAGGER_CLOUD_TOKEN: ${{ secrets.DAGGER_CLOUD_TOKEN }}
-          PATH: "/usr/local/bin:${{ env.PATH }}"
         run: |
           # Verify Dagger is available
-          which dagger
-          dagger version
+          if command -v /usr/local/bin/dagger >/dev/null 2>&1; then
+            echo "✅ Dagger found at /usr/local/bin/dagger"
+            /usr/local/bin/dagger version
+          else
+            echo "❌ Dagger not found at /usr/local/bin/dagger"
+            ls -la /usr/local/bin/ | grep -i dagger || echo "No dagger binary found"
+            exit 1
+          fi
           # Run the tests
-          dagger -m ci/dagger call test --source=.
+          /usr/local/bin/dagger -m ci/dagger call test --source=.
         timeout-minutes: 15
