@@ -19,7 +19,15 @@ jobs:
           echo "📦 Installing Dagger CLI..."
           curl -L https://dl.dagger.io/dagger/install.sh | sudo sh
           echo "🔍 Checking installation..."
-          ls -la /usr/local/bin/ | grep -i dagger || echo "No dagger binary found in /usr/local/bin/"
+          # The installer puts dagger in ./bin/dagger, let's move it to /usr/local/bin
+          if [ -f "./bin/dagger" ]; then
+            echo "✅ Found dagger at ./bin/dagger, moving to /usr/local/bin/"
+            sudo mv ./bin/dagger /usr/local/bin/dagger
+            sudo chmod +x /usr/local/bin/dagger
+          else
+            echo "❌ Dagger not found at ./bin/dagger"
+            find . -name "dagger" -type f 2>/dev/null || echo "No dagger binary found anywhere"
+          fi
 
       - name: Run Dagger pipeline
         env:
