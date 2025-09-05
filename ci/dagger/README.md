@@ -1,17 +1,18 @@
-Dagger Go integration runner
+Integration Tests Dagger Module
 
-This small CLI uses the Dagger Go SDK to run the `test-validator` integration script inside a container.
+This Dagger module provides functions to run integration tests inside containers for consistent, reproducible test execution.
 
 Prerequisites:
-- Dagger engine (desktop or remote) available. See https://dagger.io for details.
-- Go 1.20+
+- Dagger CLI installed. See https://dagger.io for details.
 
-Build and run locally:
+Usage:
 
 ```bash
-cd ci/dagger
-go build -o run
-./run
+# Run integration tests from repository root
+dagger -m ci/dagger call test --source=.
+
+# Get a configured test container for interactive debugging
+dagger -m ci/dagger call test-container --source=. terminal
 ```
 
-The program mounts the repository into the container and executes `test/containers/test-validator/run-integration-tests.sh`.
+The module mounts the repository into an Ubuntu container and executes `test/containers/test-validator/run-integration-tests.sh`.

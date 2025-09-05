@@ -17,7 +17,7 @@ help:
     @just --list --unsorted | grep -E "router" | head -10
     @echo ""
     @echo "🧪 Integration Testing:"
-    @just --list --unsorted | grep -E "(integration|tilt)" | head -15
+    @just --list --unsorted | grep -E "(integration|tilt|dagger)" | head -15
     @echo ""
     @echo "For detailed help: just help-detailed"
 
@@ -64,6 +64,8 @@ help-detailed:
     @echo ""
     @echo "🧪 Integration Testing:"
     @echo "  just test-integration       - Run complete Docker-based integration tests"
+    @echo "  just dagger-test            - Run integration tests via Dagger (modern)"
+    @echo "  just dagger-test-shell      - Get interactive shell in test container"
     @echo "  just integration-build      - Build integration test containers"
     @echo "  just integration-up         - Start integration test environment"
     @echo "  just integration-down       - Stop integration test environment"
@@ -288,6 +290,20 @@ integration-clean:
     @env bash -lc 'set -o pipefail; ./scripts/docker_compose.sh -f test/integration/docker-compose.yml down -v; docker system prune -f; ./scripts/print-exit-status'
 
 # =============================================================================
+# Dagger Integration Testing (Modern Alternative)
+# =============================================================================
+
+# Run integration tests via Dagger (cleaner, more portable than Docker Compose)
+dagger-test:
+    @echo "🧪 Running integration tests via Dagger..."
+    dagger -m ci/dagger call test --source=.
+
+# Get an interactive shell in the Dagger test container for debugging
+dagger-test-shell:
+    @echo "🐚 Opening interactive shell in Dagger test container..."
+    dagger -m ci/dagger call test-container --source=. terminal
+
+# =============================================================================
 # Tilt Development Environment Commands
 # =============================================================================
 
@@ -363,7 +379,7 @@ setup:
         echo "❌ Go not found. Please install Go 1.25+"; \
         exit 1; \
     fi
-    @echo "✅ Go found: $(shell go version)"
+    @echo "✅ Go found: `go version`"
     
     @if ! command -v docker >/dev/null 2>&1; then \
         echo "❌ Docker not found. Please install Docker"; \
@@ -371,21 +387,28 @@ setup:
         echo "   Linux: curl -fsSL https://get.docker.com -o get-docker.sh && sudo sh get-docker.sh"; \
         exit 1; \
     fi
-    @echo "✅ Docker found: $(shell docker --version)"
+    @echo "✅ Docker found: `docker --version`"
     
     @if ! command -v kubectl >/dev/null 2>&1; then \
         echo "⚠️  kubectl not found. Install for Tilt development:"; \
         echo "   macOS: brew install kubectl"; \
         echo "   Linux: See https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/"; \
     else \
-        echo "✅ kubectl found: $(shell kubectl version --client --short 2>/dev/null || echo 'kubectl available')"; \
+        echo "✅ kubectl found: `kubectl version --client 2>/dev/null | head -1 || echo 'kubectl available'`"; \
     fi
     
     @if ! command -v tilt >/dev/null 2>&1; then \
         echo "⚠️  Tilt not found. Install for development environment:"; \
         echo "   curl -fsSL https://raw.githubusercontent.com/tilt-dev/tilt/master/scripts/install.sh | bash"; \
     else \
-        echo "✅ Tilt found: $(shell tilt version 2>/dev/null | head -1 || echo 'Tilt available')"; \
+        echo "✅ Tilt found: `tilt version 2>/dev/null | head -1 || echo 'Tilt available'`"; \
+    fi
+    
+    @if ! command -v dagger >/dev/null 2>&1; then \
+        echo "⚠️  Dagger not found. Install for modern integration testing:"; \
+        echo "   curl -L https://dl.dagger.io/dagger/install.sh | sh"; \
+    else \
+        echo "✅ Dagger found: `dagger version 2>/dev/null | head -1 || echo 'Dagger available'`"; \
     fi
     
     @echo ""
@@ -408,6 +431,7 @@ setup:
     @echo ""
     @echo "🧪 Run tests:"
     @echo "   just test                   # Unit tests"
+    @echo "   just dagger-test           # Integration tests (modern, via Dagger)"
     @echo "   just tilt-test             # Integration tests (requires 'just dev')"
     @echo ""
     @echo "🎛️ Try the Audio Router Hub:"
@@ -441,13 +465,14 @@ status:
     @echo "📋 Go Environment:"
     @go version 2>/dev/null || echo "❌ Go not available"
     @echo "GOPATH: ${GOPATH:-not set}"
-    @echo "GOOS: $(shell go env GOOS)"
-    @echo "GOARCH: $(shell go env GOARCH)"
+    @echo "GOOS: `go env GOOS`"
+    @echo "GOARCH: `go env GOARCH`"
     @echo ""
     @echo "🐳 Container Environment:" 
     @docker --version 2>/dev/null || echo "❌ Docker not available"
-    @kubectl version --client --short 2>/dev/null || echo "❌ kubectl not available"
+    @kubectl version --client 2>/dev/null | head -1 || echo "❌ kubectl not available"
     @tilt version 2>/dev/null | head -1 || echo "❌ Tilt not available"
+    @dagger version 2>/dev/null | head -1 || echo "❌ Dagger not available"
     @echo ""
     @echo "📊 Services Status:"
     @if curl -s -f http://localhost:9090/status >/dev/null 2>&1; then \

@@ -1,4 +1,4 @@
-name: CI - Dagger
+name: Integration Tests
 
 on:
   push:
@@ -8,68 +8,21 @@ on:
 
 jobs:
   dagger-run:
-    name: Dagger Go pipeline
+    name: Dagger Integration Tests
     runs-on: ubuntu-latest
-    services:
-      docker:
-        image: docker:24-dind
-        options: >-
-          --privileged
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Go
-        uses: actions/setup-go@v4
-        with:
-          go-version: '1.25'
+      - name: Install Dagger CLI
+        run: |
+          curl -L https://dl.dagger.io/dagger/install.sh | sudo sh
 
-      - name: Build and run Dagger pipeline (Go-based runner)
+      - name: Run Dagger pipeline
         env:
           CI: "true"
+          # Use GitHub Actions cache for Dagger engine
+          DAGGER_CLOUD_TOKEN: ${{ secrets.DAGGER_CLOUD_TOKEN }}
         run: |
-          # Ensure Docker client talks to the DinD service
-          echo "DOCKER_HOST=tcp://localhost:2375" >> $GITHUB_ENV
-          # Prefer a specific Dagger engine image version so the engine socket
-          # path and behavior are predictable in CI (use v0.18.7)
-          echo "DAGGER_ENGINE_IMAGE=dagger/engine:v0.18.7" >> $GITHUB_ENV
-
-          cd ci/dagger
-
-          # Wait for the Dagger engine socket to appear inside the engine
-          # container. The Dagger client will create an engine container named
-          # like dagger-engine-*; wait up to 60s for any /run/dagger/*.sock there.
-          set -x
-          found=0
-          for i in $(seq 1 12); do
-            # look for any running or stopped container with "dagger-engine" in its name
-            engine=$(docker ps -a --format '{{.Names}}' | grep dagger-engine || true)
-            if [ -n "$engine" ]; then
-              # try each matching container for the socket file
-              for c in $engine; do
-                docker exec -i "$c" sh -c 'test -S /run/dagger/engine.sock' >/dev/null 2>&1 && found=1 && break
-              done
-            fi
-            if [ "$found" -eq 1 ]; then break; fi
-            echo "waiting for dagger engine socket... ($i)"
-            sleep 5
-          done
-
-          if [ "$found" -ne 1 ]; then
-            echo "ERROR: dagger engine socket did not appear; printing diagnostics"
-            echo "----- docker ps -a -----"
-            docker ps -a --format 'table {{.ID}}\t{{.Names}}\t{{.Status}}' || true
-            echo "----- looking for dagger-engine containers -----"
-            docker ps -a --filter "name=dagger-engine" --format 'table {{.ID}}\t{{.Names}}\t{{.Status}}' || true
-            echo "----- docker logs for dagger-engine* -----"
-            for c in $(docker ps -a --format '{{.Names}}' | grep dagger-engine || true); do
-              echo "--- logs for $c ---"
-              docker logs "$c" || true
-            done
-            echo "----- end diagnostics -----"
-            exit 1
-          fi
-
-          # Engine socket present (or timed out earlier); run the Go-based runner
-          go run main.go
-        timeout-minutes: 30
+          dagger -m ci/dagger call test --source=.
+        timeout-minutes: 15
