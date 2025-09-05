@@ -15,7 +15,7 @@ type IntegrationTests struct{}
 // Run integration tests in a Ubuntu container
 func (m *IntegrationTests) Test(ctx context.Context, source *dagger.Directory) (string, error) {
 	return m.testContainer(source).
-		WithExec([]string{"/bin/sh", "test/containers/test-validator/run-integration-tests.sh"}).
+		WithExec([]string{"bash", "test/containers/test-validator/run-integration-tests.sh"}).
 		Stdout(ctx)
 }
 
@@ -27,7 +27,9 @@ func (m *IntegrationTests) TestContainer(source *dagger.Directory) *dagger.Conta
 // Internal helper to create the test container
 func (m *IntegrationTests) testContainer(source *dagger.Directory) *dagger.Container {
 	return dag.Container().
-		From("ubuntu:24.04").
+		From("golang:1.25").
+		WithExec([]string{"apt-get", "update"}).
+		WithExec([]string{"apt-get", "install", "-y", "git", "ffmpeg"}).
 		WithDirectory("/work", source).
 		WithWorkdir("/work")
 }
