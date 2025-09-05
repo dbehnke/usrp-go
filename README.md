@@ -359,10 +359,25 @@ usrp-go/
 
 This implementation prioritizes **exact compatibility** with existing USRP deployments. Before making changes:
 
-1. Verify against AllStarLink `chan_usrp.c` source
-2. Test with existing AllStarLink systems  
-3. Maintain binary protocol compatibility
-4. Add comprehensive tests
+1. **Create a pull request** - The `main` branch is protected and requires PR reviews
+2. **Pass integration tests** - Dagger Integration Tests must succeed before merging  
+3. Verify against AllStarLink `chan_usrp.c` source
+4. Test with existing AllStarLink systems  
+5. Maintain binary protocol compatibility
+6. Add comprehensive tests
+
+### Branch Protection 🔒
+
+The `main` branch has protection rules enabled:
+- ✅ **Pull request required** - No direct pushes to main
+- ✅ **Integration tests required** - All 23+ test cases must pass
+- ✅ **Code review required** - At least 1 approving review needed
+- ✅ **Branch must be up-to-date** - Must merge latest changes first
+
+Run tests locally before creating PRs:
+```bash
+just dagger-test  # Runs comprehensive integration test suite
+```
 
 ## Amateur Radio Applications
 
