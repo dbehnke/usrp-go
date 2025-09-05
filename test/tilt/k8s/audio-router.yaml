@@ -1,3 +1,4 @@
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -17,69 +18,69 @@ spec:
         component: core
     spec:
       containers:
-      - name: audio-router
-        image: audio-router
-        ports:
-        - containerPort: 9090
-          name: http-status
-          protocol: TCP
-        - containerPort: 32001
-          name: usrp-1
-          protocol: UDP
-        - containerPort: 32002
-          name: usrp-2
-          protocol: UDP
-        - containerPort: 32003
-          name: whotalkie-1
-          protocol: UDP
-        - containerPort: 32004
-          name: whotalkie-2
-          protocol: UDP
-        - containerPort: 32005
-          name: discord
-          protocol: TCP
-        env:
-        - name: CONFIG_FILE
-          value: "/app/config/audio-router-dev.json"
-        - name: VERBOSE
-          value: "true"
-        - name: DEBUG
-          value: "false"
-        volumeMounts:
-        - name: config
-          mountPath: /app/config
-          readOnly: true
-        - name: audio-samples
-          mountPath: /app/audio-samples
-        - name: test-results
-          mountPath: /app/test-results
-        livenessProbe:
-          httpGet:
-            path: /status
-            port: 9090
-          initialDelaySeconds: 10
-          periodSeconds: 30
-        readinessProbe:
-          httpGet:
-            path: /status
-            port: 9090
-          initialDelaySeconds: 5
-          periodSeconds: 10
-        resources:
-          requests:
-            memory: "128Mi"
-            cpu: "100m"
-          limits:
-            memory: "512Mi"
-            cpu: "500m"
+        - name: audio-router
+          image: audio-router
+          ports:
+            - containerPort: 9090
+              name: http-status
+              protocol: TCP
+            - containerPort: 32001
+              name: usrp-1
+              protocol: UDP
+            - containerPort: 32002
+              name: usrp-2
+              protocol: UDP
+            - containerPort: 32003
+              name: whotalkie-1
+              protocol: UDP
+            - containerPort: 32004
+              name: whotalkie-2
+              protocol: UDP
+            - containerPort: 32005
+              name: discord
+              protocol: TCP
+          env:
+            - name: CONFIG_FILE
+              value: "/app/config/audio-router-dev.json"
+            - name: VERBOSE
+              value: "true"
+            - name: DEBUG
+              value: "false"
+          volumeMounts:
+            - name: config
+              mountPath: /app/config
+              readOnly: true
+            - name: audio-samples
+              mountPath: /app/audio-samples
+            - name: test-results
+              mountPath: /app/test-results
+          livenessProbe:
+            httpGet:
+              path: /status
+              port: 9090
+            initialDelaySeconds: 10
+            periodSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /status
+              port: 9090
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
       volumes:
-      - name: config
-        configMap:
-          name: audio-router-config
-      - name: audio-samples
-        emptyDir: {}
-      - name: test-results
-        emptyDir: {}
+        - name: config
+          configMap:
+            name: audio-router-config
+        - name: audio-samples
+          emptyDir: {}
+        - name: test-results
+          emptyDir: {}
 
 ---
 apiVersion: v1
@@ -91,30 +92,30 @@ metadata:
 spec:
   type: ClusterIP
   ports:
-  - name: http-status
-    port: 9090
-    targetPort: 9090
-    protocol: TCP
-  - name: usrp-1
-    port: 32001
-    targetPort: 32001
-    protocol: UDP
-  - name: usrp-2
-    port: 32002
-    targetPort: 32002
-    protocol: UDP
-  - name: whotalkie-1
-    port: 32003
-    targetPort: 32003
-    protocol: UDP
-  - name: whotalkie-2
-    port: 32004
-    targetPort: 32004
-    protocol: UDP
-  - name: discord
-    port: 32005
-    targetPort: 32005
-    protocol: TCP
+    - name: http-status
+      port: 9090
+      targetPort: 9090
+      protocol: TCP
+    - name: usrp-1
+      port: 32001
+      targetPort: 32001
+      protocol: UDP
+    - name: usrp-2
+      port: 32002
+      targetPort: 32002
+      protocol: UDP
+    - name: whotalkie-1
+      port: 32003
+      targetPort: 32003
+      protocol: UDP
+    - name: whotalkie-2
+      port: 32004
+      targetPort: 32004
+      protocol: UDP
+    - name: discord
+      port: 32005
+      targetPort: 32005
+      protocol: TCP
   selector:
     app: audio-router
 
@@ -182,7 +183,7 @@ data:
           }
         },
         {
-          "id": "allstar_dev_2", 
+          "id": "allstar_dev_2",
           "type": "usrp",
           "name": "AllStar Dev Node 2 (1kHz)",
           "description": "Development AllStarLink node with 1kHz test tone",
@@ -236,7 +237,7 @@ data:
         },
         {
           "id": "discord_dev",
-          "type": "discord", 
+          "type": "discord",
           "name": "Discord Dev Bot",
           "description": "Development Discord voice gateway",
           "enabled": true,

@@ -63,14 +63,8 @@ help-detailed:
     @echo "  just build-router           - Build Audio Router Hub binary"
     @echo ""
     @echo "🧪 Integration Testing:"
-    @echo "  just test-integration       - Run complete Docker-based integration tests"
-    @echo "  just dagger-test            - Run integration tests via Dagger (modern)"
+    @echo "  just dagger-test            - Run integration tests via Dagger"
     @echo "  just dagger-test-shell      - Get interactive shell in test container"
-    @echo "  just integration-build      - Build integration test containers"
-    @echo "  just integration-up         - Start integration test environment"
-    @echo "  just integration-down       - Stop integration test environment"
-    @echo "  just integration-logs       - Show integration test logs"
-    @echo "  just integration-clean      - Clean up integration test environment"
     @echo ""
     @echo "🚀 Tilt Development Environment:"
     @echo "  just dev                    - Start Tilt development environment (alias for tilt-up)"
@@ -251,49 +245,7 @@ build-router:
 # Integration Testing Commands
 # =============================================================================
 
-# Run complete Docker-based integration test suite
-test-integration: integration-build integration-up
-    @echo "🧪 Running complete integration test suite..."
-    sleep 15  # Wait for all services to be ready
-    @env bash -lc 'set -o pipefail; ./scripts/docker_compose.sh -f test/integration/docker-compose.yml run --rm test-validator /usr/local/bin/run-integration-tests.sh || true; ./scripts/print-exit-status'
-    @env bash -lc 'just integration-down; ./scripts/print-exit-status'
-
-# Build integration test containers
-integration-build:
-    @echo "🔨 Building Docker containers for integration testing..."
-    @env bash -lc 'set -o pipefail; ./scripts/docker_compose.sh -f test/integration/docker-compose.yml build; ./scripts/print-exit-status'
-
-# Start integration test environment
-integration-up:
-    @echo "🚀 Starting integration test environment..."
-    @env bash -lc 'set -o pipefail; ./scripts/docker_compose.sh -f test/integration/docker-compose.yml up -d; ./scripts/print-exit-status'
-    sleep 10  # Wait for services to start
-
-# Stop integration test environment
-integration-down:
-    @echo "🛑 Stopping integration test environment..."
-    @env bash -lc 'set -o pipefail; ./scripts/docker_compose.sh -f test/integration/docker-compose.yml down; ./scripts/print-exit-status'
-
-# Run integration tests (assumes environment is running)
-integration-run:
-    @echo "🏃 Running integration tests..."
-    @env bash -lc 'set -o pipefail; ./scripts/docker_compose.sh -f test/integration/docker-compose.yml run --rm test-validator /usr/local/bin/run-integration-tests.sh; ./scripts/print-exit-status'
-
-# Show integration test logs
-integration-logs:
-    @echo "📋 Showing integration test logs..."
-    @env bash -lc 'set -o pipefail; ./scripts/docker_compose.sh -f test/integration/docker-compose.yml logs; ./scripts/print-exit-status'
-
-# Clean up integration test environment
-integration-clean:
-    @echo "🧹 Cleaning up integration test environment..."
-    @env bash -lc 'set -o pipefail; ./scripts/docker_compose.sh -f test/integration/docker-compose.yml down -v; docker system prune -f; ./scripts/print-exit-status'
-
-# =============================================================================
-# Dagger Integration Testing (Modern Alternative)
-# =============================================================================
-
-# Run integration tests via Dagger (cleaner, more portable than Docker Compose)
+# Run integration tests via Dagger
 dagger-test:
     @echo "🧪 Running integration tests via Dagger..."
     dagger -m ci/dagger call test --source=.
@@ -448,7 +400,7 @@ setup:
 quick-start: setup dev
 
 # Full CI-like test suite
-ci: fmt vet lint test test-integration
+ci: fmt vet lint test dagger-test
 
 # Development quality check (faster than full CI)
 check: fmt vet test
@@ -506,7 +458,7 @@ info:
     @echo ""
     @echo "🧪 Testing:"
     @echo "  test/tilt/              # Tilt development environment"
-    @echo "  test/integration/       # Docker-based integration tests"
+    @echo "  test/integration/       # Integration test resources"
 
 # List all available recipes (same as default, but explicit)
 list:
