@@ -1,0 +1,20 @@
+site_name: usrp-go Documentation
+site_description: Documentation for the usrp-go integration and services
+site_author: dbehnke
+repo_name: dbehnke/usrp-go
+docs_dir: docs
+site_dir: site
+
+nav:
+  - Home: index.md
+  - Audio Router: audio-router.md
+
+theme:
+  name: material
+  palette:
+    - scheme: default
+      primary: indigo
+      accent: indigo
+
+plugins:
+  - search
