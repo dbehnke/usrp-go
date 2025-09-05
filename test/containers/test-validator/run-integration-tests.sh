@@ -79,6 +79,12 @@ run_test_with_output "USRP packet format demonstration" \
     "Header Structure"
 
 echo ""
+echo "$(blue "🧹 Code Quality Prerequisites")"
+run_test "just command runner availability" "which just"
+run_test "golangci-lint availability" "which golangci-lint"
+run_test "Go code linting (via just)" "just lint"
+
+echo ""
 echo "$(blue "📦 Go Module Tests")"
 run_test "Go module validation" "go mod verify"
 run_test "Go code compilation" "go build ./..."

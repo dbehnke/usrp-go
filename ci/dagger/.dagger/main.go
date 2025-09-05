@@ -29,7 +29,9 @@ func (m *IntegrationTests) testContainer(source *dagger.Directory) *dagger.Conta
 	return dag.Container().
 		From("golang:1.25").
 		WithExec([]string{"apt-get", "update"}).
-		WithExec([]string{"apt-get", "install", "-y", "git", "ffmpeg"}).
+		WithExec([]string{"apt-get", "install", "-y", "git", "ffmpeg", "curl"}).
+		WithExec([]string{"sh", "-c", "curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b /usr/local/bin latest"}).
+		WithExec([]string{"sh", "-c", "curl --proto '=https' --tlsv1.2 -sSf https://just.systems/install.sh | bash -s -- --to /usr/local/bin"}).
 		WithDirectory("/work", source).
 		WithWorkdir("/work")
 }
